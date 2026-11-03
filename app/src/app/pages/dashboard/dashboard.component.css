@@ -1,0 +1,26 @@
+.sub { margin-bottom: 16px; }
+.kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.rotulo { font-size: 12px; }
+.numero { display: block; font-size: 30px; color: var(--tx); }
+.ouro { color: var(--gold) !important; }
+.extra { color: var(--ok); font-size: 12px; margin-top: 4px; }
+
+.linha2 { display: grid; grid-template-columns: 1.3fr 1fr; gap: 16px; margin-top: 16px; }
+
+.barras { display: flex; align-items: end; justify-content: space-around; height: 230px; gap: 10px; }
+.coluna { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 1; }
+.barra { width: 48px; border-radius: 6px; }
+.valor { font-size: 12px; }
+.legenda { font-size: 11px; text-align: center; height: 28px; }
+
+.raridade { margin: 14px 0; }
+.rr-cab { display: flex; justify-content: space-between; margin-bottom: 6px; }
+.ponto { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 8px; }
+.trilho { height: 12px; background: var(--bg); border-radius: 6px; overflow: hidden; }
+.preenchido { height: 100%; border-radius: 6px; }
+
+.topo5 { margin-top: 16px; }
+.clicavel { cursor: pointer; }
+.clicavel:hover td { background: #ffffff08; }
+.mini { display: inline-block; width: 18px; vertical-align: middle; margin-right: 10px; border-width: 1px; border-radius: 3px; }
+.mini:after { display: none; }

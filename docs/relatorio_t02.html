@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><title>Relatório Trabalho 02 — CardVault JP</title>
+<style>
+body{font-family:Arial,Helvetica,sans-serif;font-size:12pt;line-height:1.5;color:#111;text-align:justify}
+.capa{height:240mm;display:flex;flex-direction:column;justify-content:space-between;text-align:center;page-break-after:always}
+.capa h1{font-size:20pt;margin:0}.capa p{margin:4px 0}
+h2{font-size:13pt;margin:22px 0 8px;text-transform:uppercase;page-break-after:avoid;break-after:avoid}h3{font-size:12pt;margin:16px 0 6px;page-break-after:avoid;break-after:avoid}
+p{margin:0 0 10px;text-indent:1.25cm}li p,.ni{text-indent:0}
+ul{margin:4px 0 10px 0;padding-left:22px}li{margin:2px 0}
+table{border-collapse:collapse;width:100%;font-size:10.5pt;margin:8px 0;text-align:left}td,th{border:1px solid #888;padding:5px 7px;text-align:left;vertical-align:top}th{background:#eee}
+figure{margin:10px 0 10px;text-align:center;page-break-inside:avoid}figure img{width:88%;border:1px solid #999}figcaption{font-size:10pt;margin-top:4px}
+code{font-family:Consolas,monospace;font-size:10pt;background:#f2f2f2;padding:1px 4px}
+pre{font-family:Consolas,monospace;font-size:9.5pt;background:#f6f6f6;border:1px solid #ccc;padding:8px 10px;line-height:1.35;text-align:left;white-space:pre-wrap;page-break-inside:avoid}
+.tela{page-break-before:always}
+.commits td{font-size:9pt;padding:3px 6px}.commits td:first-child{font-family:Consolas,monospace;white-space:nowrap}
+</style></head><body>
+
+<div class="capa">
+<div><p><b>UNIVERSIDADE FUMEC</b></p><p>CURSO DE CIÊNCIA DA COMPUTAÇÃO</p><p>DESENVOLVIMENTO WEB FRONT-END</p><p>PROF. DÂNGELO SILVA MIRANDA</p></div>
+<div><p>KAIQUE FERREIRA PEIXOTO</p><br><h1>CARDVAULT JP — TRABALHO 02</h1><p>Aplicação Angular: componentes, rotas, serviços e data-binding</p></div>
+<div><p>Belo Horizonte</p><p>2026</p></div>
+</div>
+
+<h2>1. Integrantes</h2>
+<p class="ni">Kaique Ferreira Peixoto (trabalho individual).</p>
+
+<h2>2. Descrição da aplicação</h2>
+<p class="ni"><b>Nome:</b> CardVault JP.</p>
+<p><b>Objetivo:</b> oferecer a colecionadores e lojistas um ambiente único para gestão, catalogação, avaliação e negociação de cartas colecionáveis de Pokémon TCG, com foco em coleções japonesas e itens de nicho. Nesta segunda entrega, o protótipo HTML/CSS do Trabalho 01 foi convertido em uma aplicação Angular 22 baseada em <code>NgModule</code>, com seis páginas roteadas, um modelo de dados tipado, dados simulados (mock) e serviços que concentram toda a regra de negócio. As cartas, nomes e coleções são fictícios e as artes são gradientes CSS, sem imagens ou nomes oficiais.</p>
+<p class="ni"><b>Principais funcionalidades desta versão:</b></p>
+<ul>
+<li>Catálogo com busca por nome, número ou coleção e filtros combináveis de raridade, tipo e coleção;</li>
+<li>Página de detalhe acessada pela rota parametrizada <code>/cards/:id</code>, com atributos, valor em reais, estado de conservação, histórico de preço em SVG e ações de negociar, editar e voltar;</li>
+<li>Área administrativa com CRUD completo (cadastrar, editar e excluir com confirmação) e formulário com validação;</li>
+<li>Dashboard com indicadores calculados pelo serviço (total, unidades, valor do acervo, valor médio), gráfico por coleção, distribuição por raridade e top 5 cartas mais valiosas;</li>
+<li>Login com perfis Cliente e Administrador (usuários mock), cadastro de novo cliente e página institucional com formulário de contato validado;</li>
+<li>Navbar com <code>routerLink</code>/<code>routerLinkActive</code> e identidade visual do protótipo (fundo #0F1220, superfícies #1A1F35, destaque #E3350D, dourado #F2C14E, texto #F5F5F7, fonte Inter, botões com 8 px de raio).</li>
+</ul>
+
+<h2>3. Arquitetura desta versão</h2>
+<h3>3.1 Estrutura de pastas</h3>
+<pre>cardvault-jp/
+├── prototipo/            (Trabalho 01)
+├── docs/                 prints/ + este relatório
+└── app/                  projeto Angular 22 (NgModule)
+    ├── angular.json, package.json, tsconfig*.json
+    └── src/
+        ├── index.html, main.ts, styles.css   (identidade visual global)
+        └── app/
+            ├── app.module.ts                 declarations, FormsModule, pt-BR
+            ├── app-routing.module.ts         rotas da aplicação
+            ├── app.component.*               &lt;app-navbar&gt; + &lt;router-outlet&gt;
+            ├── models/    card.model.ts, usuario.model.ts
+            ├── mocks/     cards.mock.ts
+            ├── services/  card.service.ts, auth.service.ts
+            ├── pipes/     conservacao.pipe.ts
+            ├── components/navbar/
+            └── pages/     catalogo/, detalhe-card/, admin-cards/,
+                           dashboard/, sobre/, login/</pre>
+<p>O projeto foi criado com <code>ng new cardvault-jp --no-standalone --routing --style=css --ssr=false</code>. Todos os componentes são declarados no <code>AppModule</code> (<code>standalone: false</code>). Os arquivos gerados pelo CLI 22 com o novo padrão de nomes (<code>app-module.ts</code>, <code>app-routing-module.ts</code>) foram renomeados para a convenção <code>app.module.ts</code> e <code>app-routing.module.ts</code>.</p>
+
+<h3>3.2 Model <code>Card</code> (src/app/models/card.model.ts)</h3>
+<table>
+<tr><th>Campo</th><th>Tipo</th><th>Descrição</th></tr>
+<tr><td>id</td><td>number</td><td>Código interno (gerado pelo serviço no cadastro)</td></tr>
+<tr><td>nome, colecao, numero</td><td>string</td><td>Nome da carta, coleção e número na coleção</td></tr>
+<tr><td>tipo</td><td>Tipo</td><td>'Fogo' | 'Água' | 'Planta' | 'Elétrico' | 'Psíquico' | 'Fada'</td></tr>
+<tr><td>raridade</td><td>Raridade</td><td>'Comum' | 'Rara' | 'Ultra Rara' | 'Secreta' | 'Promo'</td></tr>
+<tr><td>idioma, variante</td><td>string</td><td>Idioma da impressão e variante/edição (Holo, 1ª Edição...)</td></tr>
+<tr><td>estado</td><td>Estado</td><td>Conservação: 'M' | 'NM' | 'EX' | 'GD' | 'PL'</td></tr>
+<tr><td>preco, estoque, ano</td><td>number</td><td>Valor estimado em R$, unidades disponíveis e ano de lançamento</td></tr>
+<tr><td>gradiente</td><td>Gradiente</td><td>Classe CSS da arte ('g1' a 'g6'), usada no lugar de imagem</td></tr>
+<tr><td>dataCadastro</td><td>string (ISO)</td><td>Data de inclusão no acervo (exibida com o pipe <code>date</code>)</td></tr>
+</table>
+<p>O mesmo arquivo define <code>FiltrosCard</code> (raridade, tipo e coleção usados na pesquisa) e <code>Contagem</code> (par chave/quantidade usado pelo dashboard).</p>
+
+<h3>3.3 Mock (src/app/mocks/cards.mock.ts)</h3>
+<p>A constante <code>CARDS_MOCK: Card[]</code> contém 12 cartas fictícias (ex.: <i>Pyrodrake Kasumi Holo</i>, <i>Voltilo Tribute</i>, <i>Psymora Gold</i>) distribuídas em 8 coleções, 6 tipos e 5 raridades. O <code>CardService</code> faz uma cópia desse array ao iniciar e passa a ser o único ponto de acesso aos dados; os componentes nunca importam o mock nem manipulam o array diretamente.</p>
+
+<h3>3.4 CardService (src/app/services/card.service.ts — <code>providedIn: 'root'</code>)</h3>
+<table>
+<tr><th>Método</th><th>O que faz</th></tr>
+<tr><td><code>listar(): Card[]</code></td><td>Retorna cópias de todas as cartas do acervo.</td></tr>
+<tr><td><code>buscarPorId(id)</code></td><td>Retorna a carta com o id informado (ou <code>undefined</code>); usado no detalhe e na edição.</td></tr>
+<tr><td><code>pesquisar(termo, filtros)</code></td><td>Busca o termo em nome, número e coleção (sem diferenciar maiúsculas) e aplica os filtros de raridade, tipo e coleção.</td></tr>
+<tr><td><code>listarColecoes()</code></td><td>Lista as coleções distintas, ordenadas, para os selects de filtro e o formulário.</td></tr>
+<tr><td><code>cadastrar(card)</code></td><td>Valida, gera o próximo id e a data de cadastro e adiciona a carta.</td></tr>
+<tr><td><code>editar(card)</code></td><td>Valida e substitui a carta de mesmo id; lança erro se não existir.</td></tr>
+<tr><td><code>excluir(id)</code></td><td>Remove a carta e retorna <code>true</code> se algo foi excluído.</td></tr>
+<tr><td><code>total()</code></td><td>Quantidade de cartas distintas cadastradas.</td></tr>
+<tr><td><code>totalUnidades()</code></td><td>Soma do estoque de todas as cartas.</td></tr>
+<tr><td><code>valorAcervo()</code></td><td>Soma de preço × estoque (valor estimado do acervo).</td></tr>
+<tr><td><code>contagemPorRaridade()</code></td><td>Quantidade de cartas por raridade (gráfico de distribuição).</td></tr>
+<tr><td><code>contagemPorColecao()</code></td><td>Quantidade de cartas por coleção, em ordem decrescente (gráfico de barras).</td></tr>
+<tr><td><code>maisValiosos(limite)</code></td><td>As <i>n</i> cartas de maior preço (tabela do dashboard).</td></tr>
+<tr><td><code>historicoPreco(card)</code> / <code>variacaoPreco(card)</code></td><td>Série simulada de 10 meses terminando no preço atual e sua variação percentual (gráfico do detalhe).</td></tr>
+<tr><td><code>validar(card)</code> <i>(privado)</i></td><td>Regras de negócio: nome e coleção obrigatórios, preço &gt; 0 e estoque ≥ 0.</td></tr>
+</table>
+<p>Também foi criado o <b>AuthService</b>, com usuários mock (<code>cliente@cardvault.jp</code> e <code>admin@cardvault.jp</code>) e os métodos <code>login(email, senha, perfil)</code>, <code>registrar()</code>, <code>logout()</code>, <code>estaLogado()</code> e <code>isAdmin()</code>, que servirá de base para os Route Guards.</p>
+
+<h3>3.5 Rotas (src/app/app-routing.module.ts)</h3>
+<table>
+<tr><th>Caminho</th><th>Componente / ação</th></tr>
+<tr><td><code>''</code></td><td>redirectTo <code>/catalogo</code> (pathMatch: 'full')</td></tr>
+<tr><td><code>catalogo</code></td><td>CatalogoComponent</td></tr>
+<tr><td><code>cards/:id</code></td><td>DetalheCardComponent (lê o parâmetro com <code>ActivatedRoute.paramMap</code>)</td></tr>
+<tr><td><code>admin/cards</code></td><td>AdminCardsComponent (aceita <code>?editar=id</code> para abrir a edição)</td></tr>
+<tr><td><code>login</code></td><td>LoginComponent</td></tr>
+<tr><td><code>dashboard</code></td><td>DashboardComponent</td></tr>
+<tr><td><code>sobre</code></td><td>SobreComponent</td></tr>
+<tr><td><code>**</code></td><td>redirectTo <code>/catalogo</code> (rota coringa)</td></tr>
+</table>
+<p class="ni"><b>Navegação programática (<code>Router.navigate</code>):</b> clicar em um card do catálogo ou do top 5 do dashboard abre <code>['/cards', id]</code>; os botões Voltar e Editar do detalhe vão para o catálogo e para <code>/admin/cards?editar=id</code>; salvar no admin volta para a lista <code>/admin/cards</code>; o login redireciona conforme o perfil e o logout da navbar volta para <code>/login</code>.</p>
+
+<h3>3.6 Diretivas, data-binding e pipes utilizados</h3>
+<table>
+<tr><th>Recurso</th><th>Exemplo no código</th><th>Onde aparece</th></tr>
+<tr><td>Interpolação <code>{{ }}</code></td><td><code>{{ card.nome }}</code>, <code>{{ totalAcervo }} cartas no acervo</code></td><td>Todas as páginas e navbar</td></tr>
+<tr><td>Property binding <code>[ ]</code></td><td><code>[routerLink]="link.rota"</code>, <code>[value]="r"</code>, <code>[disabled]="propostaEnviada"</code>, <code>[attr.points]</code>, <code>[style.width.%]</code></td><td>Navbar, filtros, detalhe (SVG), dashboard, admin</td></tr>
+<tr><td>Event binding <code>( )</code></td><td><code>(click)="abrirDetalhe(card)"</code>, <code>(ngSubmit)="salvar(f)"</code>, <code>(ngModelChange)="filtrar()"</code></td><td>Catálogo, detalhe, admin, login, sobre, navbar</td></tr>
+<tr><td>Two-way <code>[(ngModel)]</code></td><td><code>[(ngModel)]="termo"</code>, <code>[(ngModel)]="modelo.preco"</code></td><td>Busca/filtros do catálogo, formulário e filtro do admin, login, contato</td></tr>
+<tr><td><code>*ngFor</code></td><td><code>*ngFor="let card of cards"</code></td><td>Grade do catálogo, tabela do admin, links da navbar, gráficos do dashboard, opções dos selects</td></tr>
+<tr><td><code>*ngIf</code> (com <code>else</code>)</td><td><code>*ngIf="cards.length &gt; 0; else vazio"</code>, <code>*ngIf="card as c; else naoEncontrado"</code></td><td>Catálogo, detalhe, mensagens de validação e de sucesso, navbar (logado/deslogado)</td></tr>
+<tr><td><code>[ngClass]</code></td><td><code>[ngClass]="card.gradiente"</code>, <code>[ngClass]="{ err: nome.invalid &amp;&amp; ... }"</code></td><td>Arte das cartas, tags de raridade, estados de validação, abas do login</td></tr>
+<tr><td><code>[ngStyle]</code></td><td><code>[ngStyle]="{ height: ... + 'px' }"</code>, <code>[ngStyle]="{ opacity: m }"</code></td><td>Barras do dashboard, miniaturas do detalhe, cartas da vitrine do login, estoque zerado no admin</td></tr>
+<tr><td>Pipe <code>currency</code></td><td><code>{{ card.preco | currency:'BRL' }}</code> (locale pt-BR)</td><td>Catálogo, detalhe, admin, dashboard</td></tr>
+<tr><td>Pipes <code>date</code> e <code>number</code></td><td><code>{{ c.dataCadastro | date:'dd/MM/yyyy' }}</code>, <code>{{ variacao | number:'1.1-1' }}</code></td><td>Detalhe e dashboard</td></tr>
+<tr><td>Pipe próprio <code>conservacao</code></td><td><code>{{ c.estado | conservacao }}</code> → "Near Mint (NM)"</td><td>Detalhe, select de estado do admin, dashboard</td></tr>
+<tr><td>Template reference / validação</td><td><code>#f="ngForm"</code>, <code>#nome="ngModel"</code>, <code>required</code>, <code>minlength</code>, <code>min="0.01"</code>, <code>email</code>, <code>pattern</code></td><td>Admin, login, sobre</td></tr>
+<tr><td><code>routerLink</code> / <code>routerLinkActive</code></td><td><code>routerLinkActive="on"</code></td><td>Navbar e trilha do detalhe</td></tr>
+</table>
+
+<h2>4. Telas</h2>
+<p>Os prints a seguir foram capturados com a aplicação em execução (<code>ng serve</code>) na resolução 1440×900, usando Playwright, com o usuário administrador logado.</p>
+
+<div><h3>4.1 Login (/login)</h3>
+<figure><img src="prints/01-login.png"><figcaption>Figura 1 — Login com validação de senha (mínimo de 8 caracteres)</figcaption></figure>
+<ul>
+<li>Abas Entrar/Cadastrar alternadas com <code>[ngClass]</code> e <code>*ngIf</code>;</li>
+<li>Seleção de perfil Cliente/Administrador e autenticação via <code>AuthService</code> (usuários mock);</li>
+<li>Validação de e-mail (formato com domínio) e senha (mínimo 8), com feedback verde/vermelho;</li>
+<li>Após o login, <code>Router.navigate</code> leva o admin para <code>/admin/cards</code> e o cliente para <code>/catalogo</code>; a navbar passa a exibir o usuário e o botão Sair;</li>
+<li>Aba Cadastrar com nome, e-mail, senha e confirmação (verifica se as senhas conferem).</li>
+</ul></div>
+
+<div class="tela"><h3>4.2 Catálogo (/catalogo)</h3>
+<figure><img style="width:76%" src="prints/02-catalogo.png"><figcaption>Figura 2 — Catálogo com os 12 cards do acervo</figcaption></figure>
+<figure><img style="width:76%" src="prints/03-catalogo-filtros.png"><figcaption>Figura 3 — Busca "holo" combinada com o filtro Ultra Rara</figcaption></figure>
+<ul>
+<li>Grade de cards gerada com <code>*ngFor</code> a partir de <code>CardService.pesquisar()</code>;</li>
+<li>Busca por nome, número ou coleção e filtros de raridade, tipo e coleção com <code>[(ngModel)]</code>, atualizando a lista a cada alteração;</li>
+<li>Tags dos filtros ativos (clicáveis para remover) e botão Limpar filtros; mensagem quando nenhum card é encontrado;</li>
+<li>Preço formatado com <code>currency:'BRL'</code> e cor da raridade com <code>[ngClass]</code>;</li>
+<li>Clique no card abre o detalhe com <code>Router.navigate(['/cards', id])</code>.</li>
+</ul></div>
+
+<div class="tela"><h3>4.3 Detalhe do card (/cards/:id)</h3>
+<figure><img src="prints/04-detalhe.png"><figcaption>Figura 4 — Detalhe do card #1000</figcaption></figure>
+<ul>
+<li>Lê o <code>:id</code> com <code>ActivatedRoute</code> e obtém os dados com <code>CardService.buscarPorId()</code>; exibe mensagem se o id não existir;</li>
+<li>Atributos: variante, idioma, estado (pipe <code>conservacao</code>), tipo, coleção, ano, código e estoque; data de cadastro com <code>date</code>;</li>
+<li>Gráfico SVG do histórico de preço gerado com property binding (<code>[attr.points]</code>) e variação percentual;</li>
+<li>Botão Negociar (exibe confirmação da proposta e fica desabilitado), lista de desejos, Editar (abre o admin já em modo de edição) e Voltar.</li>
+</ul></div>
+
+<div class="tela"><h3>4.4 Cadastro administrativo (/admin/cards)</h3>
+<figure><img src="prints/05-admin-lista.png"><figcaption>Figura 5 — Formulário de inclusão e tabela de cards cadastrados</figcaption></figure>
+<figure><img src="prints/06-admin-edicao.png"><figcaption>Figura 6 — Edição do card #1007 com o formulário preenchido</figcaption></figure>
+</div>
+<div>
+<figure><img src="prints/07-admin-salvo.png"><figcaption>Figura 7 — Após salvar: mensagem de sucesso e tabela atualizada (nome e preço do #1007)</figcaption></figure>
+<ul>
+<li>Formulário template-driven (<code>#f="ngForm"</code>) para cadastrar e editar, com prévia da arte atualizada em tempo real;</li>
+<li>Validações: nome (obrigatório, mín. 3), coleção obrigatória, preço obrigatório e maior que zero, estoque ≥ 0 e ano entre 1996 e o ano atual; mensagens exibidas com <code>*ngIf</code> e destaque com <code>[ngClass]</code>;</li>
+<li>Tabela com <code>*ngFor</code>, filtro rápido e botões Editar (carrega o card no formulário) e Excluir (com <code>confirm()</code>);</li>
+<li>Toda operação passa pelo <code>CardService</code> (<code>cadastrar</code>, <code>editar</code>, <code>excluir</code>); o CRUD funciona de verdade durante a sessão e reflete no catálogo e no dashboard;</li>
+<li>Após salvar, o formulário é limpo e <code>Router.navigate(['/admin/cards'])</code> volta para a lista.</li>
+</ul></div>
+
+<div class="tela"><h3>4.5 Dashboard (/dashboard)</h3>
+<figure><img src="prints/08-dashboard.png"><figcaption>Figura 8 — Dashboard calculado pelo CardService</figcaption></figure>
+<ul>
+<li>KPIs calculados no serviço: cartas cadastradas, unidades em estoque, valor estimado do acervo e valor médio por unidade;</li>
+<li>Gráfico de barras por coleção (<code>[ngStyle]</code> para a altura) e distribuição por raridade (<code>[style.width.%]</code>);</li>
+<li>Top 5 cartas mais valiosas, com clique abrindo o detalhe;</li>
+<li>Os números mudam automaticamente após cadastros, edições e exclusões no admin.</li>
+</ul></div>
+
+<div class="tela"><h3>4.6 Sobre (/sobre)</h3>
+<figure><img src="prints/09-sobre.png"><figcaption>Figura 9 — Página institucional com validação do formulário de contato</figcaption></figure>
+<ul>
+<li>História, missão, números (unidades no acervo vindas do <code>CardService</code>) e valores gerados com <code>*ngFor</code>;</li>
+<li>Formulário de contato com <code>[(ngModel)]</code>, validação de nome, e-mail e mensagem (mín. 10 caracteres), contador de caracteres e mensagem de envio.</li>
+</ul></div>
+
+<h2 style="page-break-before:always">5. Versionamento</h2>
+<p class="ni"><b>Repositório:</b> https://github.com/IsseiSenju/cardvault-jp</p>
+<p><b>GitFlow:</b> o trabalho foi feito na <code>develop</code>, com uma branch <code>feature/*</code> por bloco, integrada de volta com <code>merge --no-ff</code>. Ao final, a <code>develop</code> foi integrada na <code>main</code> e marcada com a tag <code>v0.2.0</code>.</p>
+<table>
+<tr><th>Branch</th><th>Conteúdo</th></tr>
+<tr><td>main</td><td>Versões estáveis entregues (tag v0.2.0)</td></tr>
+<tr><td>develop</td><td>Integração das funcionalidades</td></tr>
+<tr><td>feature/prototipo</td><td>Trabalho 01 — protótipo HTML/CSS</td></tr>
+<tr><td>feature/setup-angular</td><td>Criação do projeto Angular (NgModule), .gitignore e identidade visual</td></tr>
+<tr><td>feature/card-service</td><td>Model Card, mock, CardService e AuthService</td></tr>
+<tr><td>feature/catalogo</td><td>Navbar, rotas e página de catálogo</td></tr>
+<tr><td>feature/detalhe</td><td>Pipe conservacao, histórico de preço e página de detalhe</td></tr>
+<tr><td>feature/admin-crud</td><td>Formulário de cadastro/edição e tabela com exclusão</td></tr>
+<tr><td>feature/paginas-institucionais</td><td>Login, dashboard e sobre</td></tr>
+<tr><td>feature/documentacao</td><td>README, prints e este relatório</td></tr>
+</table>
+<p><b>Conventional Commits:</b> mensagens no formato <code>tipo(escopo): descrição</code> (<code>feat</code>, <code>fix</code>, <code>style</code>, <code>refactor</code>, <code>docs</code>, <code>chore</code>). Lista real de commits (<code>git log --oneline</code>, do mais recente para o mais antigo) no momento da geração deste relatório:</p>
+<table class="commits">
+<tr><th>Hash</th><th>Mensagem</th></tr>
+<!--COMMITS-->
+</table>
+<p class="ni" style="font-size:10pt">Após a geração deste relatório foram feitos ainda o commit que adiciona este PDF, os merges de <code>feature/documentacao</code> em <code>develop</code> e de <code>develop</code> em <code>main</code>, e a tag <code>v0.2.0</code>.</p>
+
+<h2>6. Próximas etapas</h2>
+<ul>
+<li><b>JSON-Server:</b> substituir o array em memória por uma API REST simulada (<code>db.json</code> com cards, usuários e negociações), usando <code>HttpClient</code> e <code>Observable</code> no <code>CardService</code> (GET, POST, PUT e DELETE), para que os dados persistam entre sessões;</li>
+<li><b>Route Guards:</b> proteger <code>/admin/cards</code> e <code>/dashboard</code> com um guard (<code>CanActivate</code>) baseado no <code>AuthService</code>, permitindo acesso apenas ao perfil Administrador e redirecionando para <code>/login</code>;</li>
+<li><b>Lazy Loading:</b> mover a área administrativa (admin e dashboard) para um módulo próprio (<code>AdminModule</code>) carregado sob demanda com <code>loadChildren</code>, reduzindo o bundle inicial;</li>
+<li>Melhorias: persistir a sessão do usuário, fluxo completo de negociação entre colecionadores e lista de desejos por usuário.</li>
+</ul>
+</body></html>

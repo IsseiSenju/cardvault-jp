@@ -1,0 +1,79 @@
+<main>
+  <ng-container *ngIf="card as c; else naoEncontrado">
+    <p class="mut trilha">
+      <a routerLink="/catalogo">Catálogo</a> › {{ c.colecao }} › <b>{{ c.nome }}</b>
+    </p>
+
+    <div class="layout">
+      <div>
+        <div class="art grande" [ngClass]="c.gradiente"><span>{{ c.nome }}</span></div>
+        <div class="miniaturas">
+          <div class="art" *ngFor="let m of [1, 0.6, 0.6, 0.6]" [ngClass]="c.gradiente" [ngStyle]="{ opacity: m }"></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="tags">
+          <span class="tag gold">★ {{ c.raridade }}</span>
+          <span class="tag red">{{ c.tipo }}</span>
+          <span class="tag">Nº {{ c.numero }}</span>
+          <span class="tag" [ngClass]="c.estoque > 0 ? 'ok' : 'red'">{{ c.estoque > 0 ? 'Disponível' : 'Esgotado' }}</span>
+        </div>
+        <h1 class="titulo">{{ c.nome }}</h1>
+        <p class="mut">{{ c.colecao }} • {{ c.variante }} • cadastrado em {{ c.dataCadastro | date:'dd/MM/yyyy' }}</p>
+
+        <div class="valor">
+          <div>
+            <div class="mut rotulo">Valor estimado</div>
+            <b class="preco">{{ c.preco | currency:'BRL' }}</b>
+          </div>
+          <span class="variacao" [ngClass]="variacao >= 0 ? 'sobe' : 'desce'">
+            {{ variacao >= 0 ? '▲' : '▼' }} {{ variacao | number:'1.1-1' }}% em 10 meses
+          </span>
+        </div>
+
+        <div class="atributos">
+          <div class="panel"><div class="mut rotulo">Variante / Edição</div><b>{{ c.variante }}</b></div>
+          <div class="panel"><div class="mut rotulo">Idioma</div><b>{{ c.idioma }}</b></div>
+          <div class="panel"><div class="mut rotulo">Estado de conservação</div><b>{{ c.estado | conservacao }}</b></div>
+          <div class="panel"><div class="mut rotulo">Tipo</div><b>{{ c.tipo }}</b></div>
+          <div class="panel"><div class="mut rotulo">Coleção</div><b>{{ c.colecao }}</b></div>
+          <div class="panel"><div class="mut rotulo">Ano</div><b>{{ c.ano }}</b></div>
+          <div class="panel"><div class="mut rotulo">Código interno</div><b>#{{ c.id }}</b></div>
+          <div class="panel"><div class="mut rotulo">Em estoque</div><b>{{ c.estoque }} {{ c.estoque === 1 ? 'unidade' : 'unidades' }}</b></div>
+        </div>
+
+        <div class="panel grafico">
+          <div class="cab"><h2>Histórico de preço</h2><span class="mut">Últimos 10 meses (simulado)</span></div>
+          <svg class="historico" viewBox="0 0 600 190">
+            <g *ngFor="let e of escala">
+              <line x1="40" x2="600" [attr.y1]="e.y" [attr.y2]="e.y" stroke="#2C3356" />
+              <text x="0" [attr.y]="e.y + 4" fill="#9AA0B8" font-size="9">{{ e.valor | currency:'BRL':'symbol':'1.0-0' }}</text>
+            </g>
+            <polygon [attr.points]="areaGrafico" fill="#E3350D22" />
+            <polyline [attr.points]="pontosGrafico" fill="none" stroke="#E3350D" stroke-width="3" />
+            <circle [attr.cx]="ultimoPonto.x" [attr.cy]="ultimoPonto.y" r="5" fill="#F2C14E" />
+            <text *ngFor="let m of meses; let i = index" [attr.x]="34 + i * 60" y="186" fill="#9AA0B8" font-size="11">{{ m }}</text>
+          </svg>
+        </div>
+
+        <div class="alert ok" *ngIf="propostaEnviada">✓ Proposta de negociação enviada para "{{ c.nome }}". Você será avisado por e-mail.</div>
+
+        <div class="acoes">
+          <button class="btn grande-btn" (click)="negociar()" [disabled]="propostaEnviada || c.estoque === 0">🤝 Negociar</button>
+          <button class="btn g" (click)="alternarDesejo()">{{ naListaDesejos ? '★ Na lista de desejos' : '☆ Adicionar à lista de desejos' }}</button>
+          <button class="btn g" (click)="editar()">✎ Editar</button>
+          <button class="btn g" (click)="voltar()">← Voltar</button>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <ng-template #naoEncontrado>
+    <div class="panel vazio">
+      <h2>Card #{{ idSolicitado }} não encontrado</h2>
+      <p class="mut">Ele pode ter sido removido do acervo.</p>
+      <button class="btn" (click)="voltar()">Voltar ao catálogo</button>
+    </div>
+  </ng-template>
+</main>

@@ -1,0 +1,25 @@
+nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  background: var(--sf);
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 48px;
+  z-index: 9;
+}
+
+.logo { display: flex; gap: 10px; align-items: center; font-weight: 800; font-size: 20px; text-decoration: none; }
+.logo b { color: var(--red); }
+
+ul { display: flex; gap: 28px; list-style: none; align-items: center; }
+ul a { color: var(--mut); text-decoration: none; font-weight: 500; }
+ul a.on { color: var(--tx); border-bottom: 2px solid var(--red); padding-bottom: 4px; }
+ul a.btn { color: #fff; }
+ul a.btn.ativo { box-shadow: 0 0 0 2px var(--gold); }
+
+.usuario { display: flex; gap: 10px; align-items: center; }

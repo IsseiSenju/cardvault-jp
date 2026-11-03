@@ -1,0 +1,70 @@
+<main>
+  <h1>Dashboard</h1>
+  <p class="mut sub">Visão geral do acervo • atualizado em {{ hoje | date:'dd/MM/yyyy HH:mm' }}</p>
+
+  <div class="kpis">
+    <div class="panel">
+      <div class="mut rotulo">Cartas cadastradas</div>
+      <b class="numero">{{ total }}</b>
+      <div class="extra">{{ porColecao.length }} coleções diferentes</div>
+    </div>
+    <div class="panel">
+      <div class="mut rotulo">Unidades em estoque</div>
+      <b class="numero">{{ unidades }}</b>
+      <div class="extra">soma do estoque de todas as cartas</div>
+    </div>
+    <div class="panel">
+      <div class="mut rotulo">Valor estimado do acervo</div>
+      <b class="numero ouro">{{ valorAcervo | currency:'BRL':'symbol':'1.0-0' }}</b>
+      <div class="extra">preço × estoque</div>
+    </div>
+    <div class="panel">
+      <div class="mut rotulo">Valor médio por unidade</div>
+      <b class="numero">{{ ticketMedio | currency:'BRL' }}</b>
+      <div class="extra">valor do acervo ÷ unidades</div>
+    </div>
+  </div>
+
+  <div class="linha2">
+    <div class="panel">
+      <h2>Cartas por coleção</h2>
+      <div class="barras">
+        <div class="coluna" *ngFor="let item of porColecao; let primeiro = first">
+          <span class="valor">{{ item.quantidade }}</span>
+          <div class="barra" [ngStyle]="{ height: (item.quantidade / maiorColecao) * 170 + 'px', background: primeiro ? '#E3350D' : '#2E6BE6' }"></div>
+          <span class="mut legenda">{{ item.chave }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Distribuição por raridade</h2>
+      <div class="raridade" *ngFor="let item of porRaridade">
+        <div class="rr-cab">
+          <span><i class="ponto" [style.background]="coresRaridade[item.chave]"></i>{{ item.chave }}</span>
+          <b>{{ item.quantidade }} • {{ percentual(item.quantidade) | number:'1.0-0' }}%</b>
+        </div>
+        <div class="trilho">
+          <div class="preenchido" [style.width.%]="percentual(item.quantidade)" [style.background]="coresRaridade[item.chave]"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel topo5">
+    <h2>Top 5 cartas mais valiosas</h2>
+    <table>
+      <thead><tr><th>#</th><th>Carta</th><th>Coleção</th><th>Raridade</th><th>Estado</th><th>Preço</th></tr></thead>
+      <tbody>
+        <tr *ngFor="let card of maisValiosos; let i = index" (click)="abrir(card)" class="clicavel">
+          <td>{{ i + 1 }}º</td>
+          <td><i class="mini art" [ngClass]="card.gradiente"></i><b>{{ card.nome }}</b></td>
+          <td>{{ card.colecao }}</td>
+          <td>{{ card.raridade }}</td>
+          <td>{{ card.estado | conservacao }}</td>
+          <td class="ouro"><b>{{ card.preco | currency:'BRL' }}</b></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</main>
