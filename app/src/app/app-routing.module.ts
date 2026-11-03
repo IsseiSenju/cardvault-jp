@@ -7,12 +7,15 @@ import { AdminCardsComponent } from './pages/admin-cards/admin-cards.component';
 
 import { LoginComponent } from './pages/login/login.component';
 
+import { DashboardComponent } from './pages/dashboard/dashboard.component';
+
 const routes: Routes = [
   { path: '', redirectTo: '/catalogo', pathMatch: 'full' },
   { path: 'catalogo', component: CatalogoComponent, title: 'CardVault JP — Catálogo' },
   { path: 'cards/:id', component: DetalheCardComponent, title: 'CardVault JP — Detalhe do card' },
   { path: 'admin/cards', component: AdminCardsComponent, title: 'CardVault JP — Cadastro de cards' },
   { path: 'login', component: LoginComponent, title: 'CardVault JP — Login' },
+  { path: 'dashboard', component: DashboardComponent, title: 'CardVault JP — Dashboard' },
   { path: '**', redirectTo: '/catalogo' }
 ];
 
