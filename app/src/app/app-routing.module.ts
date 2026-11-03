@@ -4,11 +4,8 @@ import { RouterModule, Routes } from '@angular/router';
 import { CatalogoComponent } from './pages/catalogo/catalogo.component';
 import { DetalheCardComponent } from './pages/detalhe-card/detalhe-card.component';
 import { AdminCardsComponent } from './pages/admin-cards/admin-cards.component';
-
 import { LoginComponent } from './pages/login/login.component';
-
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
-
 import { SobreComponent } from './pages/sobre/sobre.component';
 
 const routes: Routes = [
