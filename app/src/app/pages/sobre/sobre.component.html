@@ -36,7 +36,7 @@
       </div>
       <div [ngClass]="{ err: em.invalid && em.touched }">
         <label for="email">E-mail *</label>
-        <input id="email" name="email" type="email" [(ngModel)]="contato.email" #em="ngModel" required email>
+        <input id="email" name="email" type="email" [(ngModel)]="contato.email" #em="ngModel" required email pattern="[^@ ]+@[^@ ]+[.][^@ ]+">
         <small *ngIf="em.invalid && em.touched">✕ Informe um e-mail válido</small>
       </div>
       <label for="assunto">Assunto</label>
