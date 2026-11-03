@@ -1,0 +1,25 @@
+.layout { display: grid; grid-template-columns: 1fr 480px; gap: 64px; align-items: center; min-height: calc(100vh - 140px); }
+.titulo { font-size: 44px; margin: 16px 0; }
+.destaque { color: var(--red); }
+.texto { font-size: 16px; max-width: 520px; line-height: 1.6; }
+.vitrine { display: flex; gap: 16px; margin-top: 36px; }
+.vitrine .art { width: 150px; }
+
+.caixa { padding: 28px; }
+.abas { display: flex; border-bottom: 1px solid var(--line); margin-bottom: 18px; }
+.abas div { flex: 1; padding: 10px; text-align: center; color: var(--mut); cursor: pointer; }
+.abas div.ativa { font-weight: 700; color: var(--tx); border-bottom: 2px solid var(--red); }
+
+.perfis { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+.extras { display: flex; justify-content: space-between; align-items: center; margin: 14px 0; font-size: 13px; }
+.check { display: flex; gap: 6px; align-items: center; margin: 0; font-size: 13px; font-weight: 400; }
+.check input { width: auto; }
+.link { color: var(--gold); cursor: pointer; }
+
+.largo { width: 100%; padding: 13px; margin-top: 8px; }
+.rodape { text-align: center; margin-top: 14px; font-size: 13px; }
+.clicavel { color: var(--tx); cursor: pointer; }
+hr { border: 0; border-top: 1px solid var(--line); margin: 18px 0; }
+.dica { font-size: 12px; }
+form .alert { margin-top: 10px; }

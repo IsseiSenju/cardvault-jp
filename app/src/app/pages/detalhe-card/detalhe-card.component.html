@@ -45,10 +45,10 @@
 
         <div class="panel grafico">
           <div class="cab"><h2>Histórico de preço</h2><span class="mut">Últimos 10 meses (simulado)</span></div>
-          <svg width="100%" height="190" viewBox="0 0 600 190">
+          <svg class="historico" viewBox="0 0 600 190">
             <g *ngFor="let e of escala">
               <line x1="40" x2="600" [attr.y1]="e.y" [attr.y2]="e.y" stroke="#2C3356" />
-              <text x="0" [attr.y]="e.y + 4" fill="#9AA0B8" font-size="10">{{ e.valor | currency:'BRL':'symbol':'1.0-0' }}</text>
+              <text x="0" [attr.y]="e.y + 4" fill="#9AA0B8" font-size="9">{{ e.valor | currency:'BRL':'symbol':'1.0-0' }}</text>
             </g>
             <polygon [attr.points]="areaGrafico" fill="#E3350D22" />
             <polyline [attr.points]="pontosGrafico" fill="none" stroke="#E3350D" stroke-width="3" />
