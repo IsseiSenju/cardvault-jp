@@ -10,6 +10,7 @@ import { NavbarComponent } from './components/navbar/navbar.component';
 import { CatalogoComponent } from './pages/catalogo/catalogo.component';
 import { DetalheCardComponent } from './pages/detalhe-card/detalhe-card.component';
 import { AdminCardsComponent } from './pages/admin-cards/admin-cards.component';
+import { LoginComponent } from './pages/login/login.component';
 import { ConservacaoPipe } from './pipes/conservacao.pipe';
 
 registerLocaleData(localePt);
@@ -21,6 +22,7 @@ registerLocaleData(localePt);
     CatalogoComponent,
     DetalheCardComponent,
     AdminCardsComponent,
+    LoginComponent,
     ConservacaoPipe
   ],
   imports: [

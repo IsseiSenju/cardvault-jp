@@ -1,0 +1,82 @@
+<main>
+  <div class="layout">
+    <div>
+      <span class="tag gold">Coleções japonesas • itens de nicho</span>
+      <h1 class="titulo">Seu acervo de cartas<br>colecionáveis, <span class="destaque">organizado.</span></h1>
+      <p class="mut texto">Catalogue, avalie e negocie cartas do TCG com histórico de preços, estado de conservação e variantes de edição.</p>
+      <div class="vitrine">
+        <div class="art" *ngFor="let c of cartasVitrine" [ngClass]="c.gradiente" [ngStyle]="{ transform: 'rotate(' + c.giro + 'deg)' }">
+          <span>{{ c.nome }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel caixa">
+      <div class="abas">
+        <div [ngClass]="{ ativa: aba === 'entrar' }" (click)="trocarAba('entrar')">Entrar</div>
+        <div [ngClass]="{ ativa: aba === 'cadastrar' }" (click)="trocarAba('cadastrar')">Cadastrar</div>
+      </div>
+
+      <!-- Aba Entrar -->
+      <form *ngIf="aba === 'entrar'" #fl="ngForm" (ngSubmit)="entrar(fl)" novalidate>
+        <div class="alert ok" *ngIf="sucessoCadastro">✓ {{ sucessoCadastro }}</div>
+
+        <label>Perfil de acesso</label>
+        <div class="perfis">
+          <button type="button" class="btn" [ngClass]="{ g: perfil !== 'cliente' }" (click)="perfil = 'cliente'">👤 Cliente</button>
+          <button type="button" class="btn" [ngClass]="{ g: perfil !== 'admin' }" (click)="perfil = 'admin'">🛡 Administrador</button>
+        </div>
+
+        <div [ngClass]="{ err: em.invalid && em.touched, okf: em.valid && em.touched }">
+          <label for="email">E-mail</label>
+          <input id="email" name="email" type="email" [(ngModel)]="email" #em="ngModel" required email placeholder="voce@email.com">
+          <small *ngIf="em.invalid && em.touched">✕ Informe um e-mail válido</small>
+          <small *ngIf="em.valid && em.touched">✓ E-mail válido</small>
+        </div>
+
+        <div [ngClass]="{ err: se.invalid && se.touched }">
+          <label for="senha">Senha</label>
+          <input id="senha" name="senha" type="password" [(ngModel)]="senha" #se="ngModel" required minlength="8">
+          <small *ngIf="se.invalid && se.touched">✕ A senha deve ter no mínimo 8 caracteres</small>
+        </div>
+
+        <div class="extras">
+          <label class="check"><input type="checkbox" name="lembrar" [(ngModel)]="lembrar"> Lembrar de mim</label>
+          <a class="link">Esqueci minha senha</a>
+        </div>
+
+        <div class="alert err" *ngIf="erroLogin">✕ {{ erroLogin }}</div>
+        <button type="submit" class="btn largo">Entrar como {{ perfil === 'admin' ? 'Administrador' : 'Cliente' }}</button>
+        <p class="mut rodape">Não tem conta? <b class="clicavel" (click)="trocarAba('cadastrar')">Cadastre-se</b></p>
+        <hr>
+        <p class="mut dica">Usuários de teste: <b>cliente&#64;cardvault.jp</b> / cliente123 • <b>admin&#64;cardvault.jp</b> / admin1234</p>
+      </form>
+
+      <!-- Aba Cadastrar -->
+      <form *ngIf="aba === 'cadastrar'" #fc="ngForm" (ngSubmit)="cadastrar(fc)" novalidate>
+        <div [ngClass]="{ err: no.invalid && no.touched }">
+          <label for="nomeCad">Nome completo</label>
+          <input id="nomeCad" name="nome" [(ngModel)]="cadastro.nome" #no="ngModel" required minlength="3">
+          <small *ngIf="no.invalid && no.touched">✕ Informe seu nome (mín. 3 caracteres)</small>
+        </div>
+        <div [ngClass]="{ err: ec.invalid && ec.touched }">
+          <label for="emailCad">E-mail</label>
+          <input id="emailCad" name="email" type="email" [(ngModel)]="cadastro.email" #ec="ngModel" required email>
+          <small *ngIf="ec.invalid && ec.touched">✕ Informe um e-mail válido</small>
+        </div>
+        <div [ngClass]="{ err: sc.invalid && sc.touched }">
+          <label for="senhaCad">Senha</label>
+          <input id="senhaCad" name="senha" type="password" [(ngModel)]="cadastro.senha" #sc="ngModel" required minlength="8">
+          <small *ngIf="sc.invalid && sc.touched">✕ Mínimo de 8 caracteres</small>
+        </div>
+        <div [ngClass]="{ err: senhasDiferentes }">
+          <label for="confCad">Confirmação de senha</label>
+          <input id="confCad" name="confirmacao" type="password" [(ngModel)]="cadastro.confirmacao" required>
+          <small *ngIf="senhasDiferentes">✕ As senhas não conferem</small>
+        </div>
+        <div class="alert err" *ngIf="erroCadastro">✕ {{ erroCadastro }}</div>
+        <button type="submit" class="btn largo" [disabled]="fc.invalid || senhasDiferentes">Criar conta</button>
+      </form>
+    </div>
+  </div>
+</main>
