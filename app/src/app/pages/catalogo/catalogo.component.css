@@ -1,0 +1,20 @@
+.topo { display: flex; justify-content: space-between; align-items: end; margin-bottom: 14px; gap: 24px; }
+.filtros { display: flex; gap: 10px; width: 760px; }
+.filtros .busca { flex: 2; }
+.filtros select { flex: 1; }
+
+.ativos { display: flex; gap: 8px; margin-bottom: 14px; align-items: center; }
+.clicavel { cursor: pointer; }
+
+.grade { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; }
+.card { cursor: pointer; transition: transform .15s, border-color .15s; }
+.card:hover { transform: translateY(-4px); border-color: var(--red); }
+.card .art { height: 200px; aspect-ratio: auto; }
+
+.info { padding: 8px 2px 0; }
+.nome { font-size: 13px; }
+.linha { display: flex; justify-content: space-between; align-items: center; margin-top: 6px; }
+.preco { color: var(--gold); }
+.meta { font-size: 11px; margin-top: 4px; }
+
+.vazio { text-align: center; padding: 48px; }
