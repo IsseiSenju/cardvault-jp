@@ -1,0 +1,136 @@
+<main>
+  <div class="topo">
+    <div>
+      <span class="tag gold">🛡 Área do Administrador</span>
+      <h1>Cadastro de Cards</h1>
+    </div>
+    <button class="btn" (click)="novo(f)">+ Novo card</button>
+  </div>
+
+  <div class="layout">
+    <!-- Formulário de inclusão / edição -->
+    <form class="panel" #f="ngForm" (ngSubmit)="salvar(f)" novalidate>
+      <div class="cab-form">
+        <h2>{{ editando ? 'Editar card #' + modelo.id : 'Incluir novo card' }}</h2>
+        <div class="art previa" [ngClass]="modelo.gradiente"><span>{{ modelo.nome || 'Prévia' }}</span></div>
+      </div>
+
+      <div [ngClass]="{ err: nome.invalid && (nome.touched || enviado), okf: nome.valid && nome.dirty }">
+        <label for="nome">Nome da carta *</label>
+        <input id="nome" name="nome" [(ngModel)]="modelo.nome" #nome="ngModel" required minlength="3">
+        <small *ngIf="nome.errors?.['required'] && (nome.touched || enviado)">✕ Campo obrigatório</small>
+        <small *ngIf="nome.errors?.['minlength']">✕ Mínimo de 3 caracteres</small>
+        <small *ngIf="nome.valid && nome.dirty">✓ OK</small>
+      </div>
+
+      <div class="duas">
+        <div [ngClass]="{ err: colecao.invalid && (colecao.touched || enviado) }">
+          <label for="colecao">Coleção *</label>
+          <input id="colecao" name="colecao" list="lista-colecoes" [(ngModel)]="modelo.colecao" #colecao="ngModel" required placeholder="Selecione ou digite...">
+          <datalist id="lista-colecoes">
+            <option *ngFor="let c of colecoes" [value]="c"></option>
+          </datalist>
+          <small *ngIf="colecao.invalid && (colecao.touched || enviado)">✕ Campo obrigatório</small>
+        </div>
+        <div>
+          <label for="numero">Número</label>
+          <input id="numero" name="numero" [(ngModel)]="modelo.numero" placeholder="006/102">
+        </div>
+
+        <div>
+          <label for="raridade">Raridade *</label>
+          <select id="raridade" name="raridade" [(ngModel)]="modelo.raridade" required>
+            <option *ngFor="let r of raridades" [value]="r">{{ r }}</option>
+          </select>
+        </div>
+        <div>
+          <label for="tipo">Tipo</label>
+          <select id="tipo" name="tipo" [(ngModel)]="modelo.tipo">
+            <option *ngFor="let t of tipos" [value]="t">{{ t }}</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="idioma">Idioma</label>
+          <select id="idioma" name="idioma" [(ngModel)]="modelo.idioma">
+            <option>Japonês</option>
+            <option>Inglês</option>
+            <option>Português</option>
+          </select>
+        </div>
+        <div>
+          <label for="estado">Estado</label>
+          <select id="estado" name="estado" [(ngModel)]="modelo.estado">
+            <option *ngFor="let e of estados" [value]="e">{{ e | conservacao }}</option>
+          </select>
+        </div>
+
+        <div [ngClass]="{ err: preco.invalid && (preco.touched || enviado), okf: preco.valid && preco.dirty }">
+          <label for="preco">Preço (R$) *</label>
+          <input id="preco" name="preco" type="number" step="0.01" [(ngModel)]="modelo.preco" #preco="ngModel" required min="0.01">
+          <small *ngIf="preco.invalid && (preco.touched || enviado)">✕ Deve ser maior que zero</small>
+          <small *ngIf="preco.valid && preco.dirty">✓ {{ modelo.preco | currency:'BRL' }}</small>
+        </div>
+        <div [ngClass]="{ err: estoque.invalid && (estoque.touched || enviado) }">
+          <label for="estoque">Estoque *</label>
+          <input id="estoque" name="estoque" type="number" [(ngModel)]="modelo.estoque" #estoque="ngModel" required min="0">
+          <small *ngIf="estoque.invalid && (estoque.touched || enviado)">✕ Não pode ser negativo</small>
+        </div>
+
+        <div>
+          <label for="variante">Variante / Edição</label>
+          <input id="variante" name="variante" [(ngModel)]="modelo.variante" placeholder="Holo • 1ª Edição">
+        </div>
+        <div [ngClass]="{ err: ano.invalid && (ano.touched || enviado) }">
+          <label for="ano">Ano *</label>
+          <input id="ano" name="ano" type="number" [(ngModel)]="modelo.ano" #ano="ngModel" required min="1996" [max]="anoAtual">
+          <small *ngIf="ano.invalid && (ano.touched || enviado)">✕ Entre 1996 e {{ anoAtual }}</small>
+        </div>
+      </div>
+
+      <label>Arte (gradiente)</label>
+      <div class="gradientes">
+        <button type="button" *ngFor="let g of gradientes" class="swatch" [ngClass]="g" [class.sel]="modelo.gradiente === g"
+                (click)="modelo.gradiente = g" [attr.aria-label]="'Gradiente ' + g"></button>
+      </div>
+
+      <div class="alert" *ngIf="mensagem" [ngClass]="tipoMensagem">{{ mensagem }}</div>
+
+      <div class="botoes">
+        <button type="submit" class="btn">{{ editando ? 'Salvar alterações' : 'Salvar card' }}</button>
+        <button type="button" class="btn g" (click)="novo(f)">Cancelar</button>
+      </div>
+    </form>
+
+    <!-- Tabela de cards cadastrados -->
+    <div class="panel">
+      <div class="cab-tabela">
+        <h2>Cards cadastrados <span class="mut">({{ cards.length }})</span></h2>
+        <input placeholder="🔍 Filtrar..." [(ngModel)]="filtroTabela" (ngModelChange)="carregar()">
+      </div>
+
+      <table>
+        <thead>
+          <tr><th>ID</th><th>Nome</th><th>Coleção</th><th>Raridade</th><th>Preço</th><th>Estoque</th><th>Ações</th></tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let card of cards" [ngClass]="{ editando: editando && modelo.id === card.id }">
+            <td>#{{ card.id }}</td>
+            <td><b>{{ card.nome }}</b></td>
+            <td>{{ card.colecao }}</td>
+            <td><span class="tag" [ngClass]="classeRaridade(card.raridade)">{{ card.raridade }}</span></td>
+            <td>{{ card.preco | currency:'BRL':'symbol':'1.0-0' }}</td>
+            <td [ngStyle]="{ color: card.estoque === 0 ? '#ff7a5c' : 'inherit' }">{{ card.estoque }}</td>
+            <td class="acoes">
+              <button class="btn g sm" (click)="iniciarEdicao(card.id)">✎ Editar</button>
+              <button class="btn sm" (click)="excluir(card, f)">🗑 Excluir</button>
+            </td>
+          </tr>
+          <tr *ngIf="cards.length === 0">
+            <td colspan="7" class="mut">Nenhum card encontrado.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</main>
