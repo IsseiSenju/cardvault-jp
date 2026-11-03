@@ -1,1 +1,92 @@
-/* You can add global styles to this file, and also import other style files */
+/* Identidade visual do protótipo (Trabalho 01) */
+:root {
+  --bg: #0F1220;
+  --sf: #1A1F35;
+  --sf2: #232946;
+  --red: #E3350D;
+  --gold: #F2C14E;
+  --tx: #F5F5F7;
+  --mut: #9AA0B8;
+  --ok: #3DDC97;
+  --line: #2C3356;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--tx);
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 14px;
+}
+
+a { color: inherit; }
+
+main { padding: 88px 48px 32px; max-width: 1440px; margin: 0 auto; }
+
+h1 { font-size: 28px; font-weight: 800; margin-bottom: 6px; }
+h2 { font-size: 17px; margin-bottom: 12px; }
+.mut { color: var(--mut); }
+
+.btn {
+  display: inline-block;
+  background: var(--red);
+  color: #fff;
+  border: 0;
+  border-radius: 8px;
+  padding: 10px 18px;
+  font: 600 14px Inter, sans-serif;
+  text-decoration: none;
+  cursor: pointer;
+}
+.btn:hover { filter: brightness(1.1); }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+.btn.g { background: transparent; border: 1px solid var(--line); color: var(--tx); }
+.btn.sm { padding: 5px 10px; font-size: 12px; }
+
+.panel { background: var(--sf); border: 1px solid var(--line); border-radius: 12px; padding: 20px; }
+
+input, select, textarea {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: var(--tx);
+  font: 14px Inter, sans-serif;
+}
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--gold); }
+label { display: block; font-size: 12px; color: var(--mut); margin: 12px 0 6px; font-weight: 600; }
+
+/* Estados de validação */
+.err input, .err select, .err textarea { border-color: var(--red); }
+.err small { color: var(--red); font-size: 12px; }
+.okf input, .okf select, .okf textarea { border-color: var(--ok); }
+.okf small { color: var(--ok); font-size: 12px; }
+
+/* Cartas: retângulos com gradiente (sem imagens oficiais) */
+.card { background: var(--sf); border: 1px solid var(--line); border-radius: 12px; padding: 10px; }
+.art { border-radius: 8px; aspect-ratio: 63/88; position: relative; overflow: hidden; border: 3px solid #ffffff22; }
+.art:after { content: ""; position: absolute; inset: 12% 10% 40%; border-radius: 4px; background: #ffffff26; }
+.art span { position: absolute; bottom: 10px; left: 10px; right: 10px; font-weight: 700; font-size: 12px; text-shadow: 0 1px 3px #000; }
+
+.tag { display: inline-block; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 20px; background: var(--sf2); color: var(--mut); }
+.tag.gold { background: #F2C14E22; color: var(--gold); }
+.tag.red { background: #E3350D22; color: #ff7a5c; }
+.tag.ok { background: #3DDC9722; color: var(--ok); }
+
+.g1 { background: linear-gradient(135deg, #E3350D, #7a1a06); }
+.g2 { background: linear-gradient(135deg, #2E6BE6, #122a66); }
+.g3 { background: linear-gradient(135deg, #F2C14E, #8a5d0b); }
+.g4 { background: linear-gradient(135deg, #3DDC97, #0f5a3b); }
+.g5 { background: linear-gradient(135deg, #9B5DE5, #3b1d66); }
+.g6 { background: linear-gradient(135deg, #F15BB5, #6b1848); }
+
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: 10px; border-bottom: 1px solid var(--line); font-size: 13px; }
+th { color: var(--mut); font-size: 11px; text-transform: uppercase; }
+
+.alert { padding: 9px 12px; border-radius: 8px; font-size: 13px; margin-bottom: 8px; }
+.alert.ok { background: #3DDC9722; color: var(--ok); }
+.alert.err { background: #E3350D22; color: #ff7a5c; }
