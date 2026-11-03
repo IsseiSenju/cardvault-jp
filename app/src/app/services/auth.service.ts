@@ -27,6 +27,16 @@ export class AuthService {
     return !!usuario;
   }
 
+  /** Cadastra um novo cliente na sessão. Retorna false se o e-mail já existir. */
+  registrar(nome: string, email: string, senha: string): boolean {
+    const emailNormalizado = email.trim().toLowerCase();
+    if (USUARIOS_MOCK.some(u => u.email === emailNormalizado)) {
+      return false;
+    }
+    USUARIOS_MOCK.push({ nome: nome.trim(), email: emailNormalizado, senha, perfil: 'cliente' });
+    return true;
+  }
+
   logout(): void {
     this.usuarioAtual = null;
   }
