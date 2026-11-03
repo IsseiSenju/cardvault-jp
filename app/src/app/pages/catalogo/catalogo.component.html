@@ -1,0 +1,57 @@
+<main>
+  <div class="topo">
+    <div>
+      <h1>Catálogo</h1>
+      <p class="mut">{{ totalAcervo }} cartas no acervo • exibindo {{ cards.length }}</p>
+    </div>
+
+    <div class="filtros">
+      <input class="busca" placeholder="🔍  Buscar por nome, número ou coleção..."
+             [(ngModel)]="termo" (ngModelChange)="filtrar()">
+
+      <select [(ngModel)]="filtros.raridade" (ngModelChange)="filtrar()">
+        <option value="">Raridade: Todas</option>
+        <option *ngFor="let r of raridades" [value]="r">{{ r }}</option>
+      </select>
+
+      <select [(ngModel)]="filtros.tipo" (ngModelChange)="filtrar()">
+        <option value="">Tipo: Todos</option>
+        <option *ngFor="let t of tipos" [value]="t">{{ t }}</option>
+      </select>
+
+      <select [(ngModel)]="filtros.colecao" (ngModelChange)="filtrar()">
+        <option value="">Coleção: Todas</option>
+        <option *ngFor="let c of colecoes" [value]="c">{{ c }}</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="ativos" *ngIf="temFiltroAtivo">
+    <span class="tag" *ngIf="termo">Busca: "{{ termo }}"</span>
+    <span class="tag gold clicavel" *ngIf="filtros.raridade" (click)="limparFiltro('raridade')">{{ filtros.raridade }} ✕</span>
+    <span class="tag red clicavel" *ngIf="filtros.tipo" (click)="limparFiltro('tipo')">{{ filtros.tipo }} ✕</span>
+    <span class="tag clicavel" *ngIf="filtros.colecao" (click)="limparFiltro('colecao')">{{ filtros.colecao }} ✕</span>
+    <button class="btn g sm" (click)="limparTudo()">Limpar filtros</button>
+  </div>
+
+  <div class="grade" *ngIf="cards.length > 0; else vazio">
+    <div class="card" *ngFor="let card of cards" (click)="abrirDetalhe(card)" [title]="'Ver detalhes de ' + card.nome">
+      <div class="art" [ngClass]="card.gradiente"><span>{{ card.nome }}</span></div>
+      <div class="info">
+        <b class="nome">{{ card.nome }}</b>
+        <div class="linha">
+          <span class="tag" [ngClass]="classeRaridade(card.raridade)">{{ card.raridade }}</span>
+          <b class="preco">{{ card.preco | currency:'BRL':'symbol':'1.0-0' }}</b>
+        </div>
+        <div class="mut meta">{{ card.colecao }} • {{ card.tipo }}</div>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #vazio>
+    <div class="panel vazio">
+      <h2>Nenhum card encontrado</h2>
+      <p class="mut">Ajuste a busca ou os filtros para ver outros cards.</p>
+    </div>
+  </ng-template>
+</main>
