@@ -4,11 +4,11 @@
 body{font-family:Arial,Helvetica,sans-serif;font-size:12pt;line-height:1.5;color:#111;text-align:justify}
 .capa{height:240mm;display:flex;flex-direction:column;justify-content:space-between;text-align:center;page-break-after:always}
 .capa h1{font-size:20pt;margin:0}.capa p{margin:4px 0}
-h2{font-size:13pt;margin:22px 0 8px;text-transform:uppercase}h3{font-size:12pt;margin:16px 0 6px}
+h2{font-size:13pt;margin:22px 0 8px;text-transform:uppercase;page-break-after:avoid;break-after:avoid}h3{font-size:12pt;margin:16px 0 6px;page-break-after:avoid;break-after:avoid}
 p{margin:0 0 10px;text-indent:1.25cm}li p,.ni{text-indent:0}
 ul{margin:4px 0 10px 0;padding-left:22px}li{margin:2px 0}
 table{border-collapse:collapse;width:100%;font-size:10.5pt;margin:8px 0;text-align:left}td,th{border:1px solid #888;padding:5px 7px;text-align:left;vertical-align:top}th{background:#eee}
-figure{margin:10px 0 10px;text-align:center;page-break-inside:avoid}figure img{width:100%;border:1px solid #999}figcaption{font-size:10pt;margin-top:4px}
+figure{margin:10px 0 10px;text-align:center;page-break-inside:avoid}figure img{width:88%;border:1px solid #999}figcaption{font-size:10pt;margin-top:4px}
 code{font-family:Consolas,monospace;font-size:10pt;background:#f2f2f2;padding:1px 4px}
 pre{font-family:Consolas,monospace;font-size:9.5pt;background:#f6f6f6;border:1px solid #ccc;padding:8px 10px;line-height:1.35;text-align:left;white-space:pre-wrap;page-break-inside:avoid}
 .tela{page-break-before:always}
@@ -47,7 +47,7 @@ pre{font-family:Consolas,monospace;font-size:9.5pt;background:#f6f6f6;border:1px
     └── src/
         ├── index.html, main.ts, styles.css   (identidade visual global)
         └── app/
-            ├── app.module.ts                 declarations + FormsModule + LOCALE_ID pt-BR
+            ├── app.module.ts                 declarations, FormsModule, pt-BR
             ├── app-routing.module.ts         rotas da aplicação
             ├── app.component.*               &lt;app-navbar&gt; + &lt;router-outlet&gt;
             ├── models/    card.model.ts, usuario.model.ts
@@ -133,7 +133,7 @@ pre{font-family:Consolas,monospace;font-size:9.5pt;background:#f6f6f6;border:1px
 <h2>4. Telas</h2>
 <p>Os prints a seguir foram capturados com a aplicação em execução (<code>ng serve</code>) na resolução 1440×900, usando Playwright, com o usuário administrador logado.</p>
 
-<div class="tela"><h3>4.1 Login (/login)</h3>
+<div><h3>4.1 Login (/login)</h3>
 <figure><img src="prints/01-login.png"><figcaption>Figura 1 — Login com validação de senha (mínimo de 8 caracteres)</figcaption></figure>
 <ul>
 <li>Abas Entrar/Cadastrar alternadas com <code>[ngClass]</code> e <code>*ngIf</code>;</li>
@@ -144,8 +144,8 @@ pre{font-family:Consolas,monospace;font-size:9.5pt;background:#f6f6f6;border:1px
 </ul></div>
 
 <div class="tela"><h3>4.2 Catálogo (/catalogo)</h3>
-<figure><img src="prints/02-catalogo.png"><figcaption>Figura 2 — Catálogo com os 12 cards do acervo</figcaption></figure>
-<figure><img src="prints/03-catalogo-filtros.png"><figcaption>Figura 3 — Busca "holo" combinada com o filtro Ultra Rara</figcaption></figure>
+<figure><img style="width:76%" src="prints/02-catalogo.png"><figcaption>Figura 2 — Catálogo com os 12 cards do acervo</figcaption></figure>
+<figure><img style="width:76%" src="prints/03-catalogo-filtros.png"><figcaption>Figura 3 — Busca "holo" combinada com o filtro Ultra Rara</figcaption></figure>
 <ul>
 <li>Grade de cards gerada com <code>*ngFor</code> a partir de <code>CardService.pesquisar()</code>;</li>
 <li>Busca por nome, número ou coleção e filtros de raridade, tipo e coleção com <code>[(ngModel)]</code>, atualizando a lista a cada alteração;</li>
