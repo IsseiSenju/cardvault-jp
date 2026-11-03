@@ -9,6 +9,8 @@ import { LoginComponent } from './pages/login/login.component';
 
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
 
+import { SobreComponent } from './pages/sobre/sobre.component';
+
 const routes: Routes = [
   { path: '', redirectTo: '/catalogo', pathMatch: 'full' },
   { path: 'catalogo', component: CatalogoComponent, title: 'CardVault JP — Catálogo' },
@@ -16,6 +18,7 @@ const routes: Routes = [
   { path: 'admin/cards', component: AdminCardsComponent, title: 'CardVault JP — Cadastro de cards' },
   { path: 'login', component: LoginComponent, title: 'CardVault JP — Login' },
   { path: 'dashboard', component: DashboardComponent, title: 'CardVault JP — Dashboard' },
+  { path: 'sobre', component: SobreComponent, title: 'CardVault JP — Sobre' },
   { path: '**', redirectTo: '/catalogo' }
 ];
 
