@@ -106,6 +106,27 @@ export class CardService {
     return this.listar().sort((a, b) => b.preco - a.preco).slice(0, limite);
   }
 
+  /**
+   * Histórico simulado dos últimos 10 meses (determinístico pelo id),
+   * terminando no preço atual. Será substituído por dados da API.
+   */
+  historicoPreco(card: Card): number[] {
+    const pontos: number[] = [];
+    for (let i = 0; i < 10; i++) {
+      const oscilacao = Math.sin(card.id + i * 1.7) * 0.06;
+      const tendencia = 0.82 + i * 0.02;
+      pontos.push(Math.round(card.preco * (tendencia + oscilacao)));
+    }
+    pontos[9] = card.preco;
+    return pontos;
+  }
+
+  /** Variação percentual entre o primeiro e o último ponto do histórico. */
+  variacaoPreco(card: Card): number {
+    const h = this.historicoPreco(card);
+    return ((h[h.length - 1] - h[0]) / h[0]) * 100;
+  }
+
   // ---------- Regras internas ----------
 
   private validar(card: Card): void {
