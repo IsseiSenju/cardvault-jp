@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
-import { NgForm } from '@angular/forms';
+import { Component, OnInit, signal, inject } from '@angular/core';
+import { AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { CardService } from '../../services/card.service';
+import { MensagemService } from '../../services/mensagem.service';
+import { PADRAO_EMAIL, naoVazio } from '../../shared/validadores';
 
 @Component({
   selector: 'app-sobre',
@@ -10,26 +12,60 @@ import { CardService } from '../../services/card.service';
 })
 export class SobreComponent implements OnInit {
 
-  totalCartas = 0;
+  // inject() porque os campos abaixo (formulários) usam estas dependências na inicialização
+  private readonly fb = inject(FormBuilder);
+
+  totalCartas = signal(0);
+  enviadoPara = signal('');
+  erro = signal('');
+  enviando = signal(false);
+
   valores = ['Autenticidade', 'Transparência', 'Comunidade', 'Preservação'];
   assuntos = ['Avaliação de carta', 'Compra e venda', 'Consignação de coleção', 'Outro assunto'];
 
-  contato = { nome: '', email: '', assunto: 'Avaliação de carta', mensagem: '' };
-  enviadoPara = '';
+  /** Formulário reativo "Fale conosco" (POST /mensagens). */
+  contato = this.fb.nonNullable.group({
+    nome: ['', [Validators.required, Validators.minLength(3), naoVazio()]],
+    email: ['', [Validators.required, Validators.pattern(PADRAO_EMAIL)]],
+    assunto: ['Avaliação de carta', Validators.required],
+    mensagem: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(500)]]
+  });
 
-  constructor(private cardService: CardService) {}
+  constructor(
+    private cardService: CardService,
+    private mensagemService: MensagemService
+  ) {}
 
   ngOnInit(): void {
-    this.totalCartas = this.cardService.totalUnidades();
+    this.cardService.estatisticas().subscribe({
+      next: e => this.totalCartas.set(e.unidades),
+      error: () => this.totalCartas.set(0)
+    });
   }
 
-  enviar(form: NgForm): void {
-    if (form.invalid) {
-      form.control.markAllAsTouched();
+  enviar(): void {
+    if (this.contato.invalid) {
+      this.contato.markAllAsTouched();
       return;
     }
-    this.enviadoPara = this.contato.nome;
-    this.contato = { nome: '', email: '', assunto: 'Avaliação de carta', mensagem: '' };
-    form.resetForm(this.contato);
+    this.enviando.set(true);
+    this.erro.set('');
+    const dados = this.contato.getRawValue();
+
+    this.mensagemService.enviar(dados).subscribe({
+      next: () => {
+        this.enviadoPara.set(dados.nome);
+        this.contato.reset();
+        this.enviando.set(false);
+      },
+      error: (e: Error) => {
+        this.erro.set(e.message);
+        this.enviando.set(false);
+      }
+    });
+  }
+
+  invalido(controle: AbstractControl): boolean {
+    return controle.invalid && controle.touched;
   }
 }
