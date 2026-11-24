@@ -31,3 +31,7 @@
 .vazio { text-align: center; padding: 48px; }
 .vazio .btn { margin-top: 16px; }
 .historico { display: block; width: 100%; height: auto; }
+
+.proposta { margin-top: 16px; }
+.proposta h2 { margin-bottom: 0; }
+.duas { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; }
