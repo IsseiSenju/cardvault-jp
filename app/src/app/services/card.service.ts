@@ -1,147 +1,168 @@
 import { Injectable } from '@angular/core';
-import { Card, Contagem, FiltrosCard, Raridade, Tipo } from '../models/card.model';
-import { CARDS_MOCK } from '../mocks/cards.mock';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable, map, of, switchMap, throwError } from 'rxjs';
+import { API_URL } from '../api.config';
+import {
+  Card, CardFormulario, Contagem, EstatisticasAcervo, FiltrosCard, PontoHistorico, Raridade, Tipo
+} from '../models/card.model';
 
 /**
- * Centraliza toda a regra de negócio dos cards. Os componentes nunca
- * acessam o array diretamente: sempre recebem cópias pelos métodos abaixo.
- * Nesta versão os dados ficam em memória (duram a sessão); na próxima etapa
- * o array será substituído por chamadas HTTP ao JSON-Server.
+ * Centraliza a regra de negócio dos cards. Os dados ficam no JSON-Server
+ * e todas as operações são feitas com requisições HTTP (HttpClient):
+ *   GET    /cards          listagem e pesquisa
+ *   GET    /cards/:id      exibição
+ *   POST   /cards          cadastro
+ *   PUT    /cards/:id      edição
+ *   DELETE /cards/:id      exclusão
  */
 @Injectable({
   providedIn: 'root'
 })
 export class CardService {
 
-  private cards: Card[] = CARDS_MOCK.map(c => ({ ...c }));
+  private readonly url = `${API_URL}/cards`;
 
   readonly raridades: Raridade[] = ['Comum', 'Rara', 'Ultra Rara', 'Secreta', 'Promo'];
   readonly tipos: Tipo[] = ['Fogo', 'Água', 'Planta', 'Elétrico', 'Psíquico', 'Fada'];
 
+  constructor(private http: HttpClient) {}
+
   // ---------- Consulta ----------
 
-  listar(): Card[] {
-    return this.cards.map(c => ({ ...c }));
+  listar(): Observable<Card[]> {
+    return this.http.get<Card[]>(this.url, { params: { _sort: 'nome' } });
   }
 
-  buscarPorId(id: number): Card | undefined {
-    const card = this.cards.find(c => c.id === id);
-    return card ? { ...card } : undefined;
+  buscarPorId(id: number): Observable<Card> {
+    return this.http.get<Card>(`${this.url}/${id}`);
   }
 
-  /** Busca por nome, número ou coleção e aplica os filtros selecionados. */
-  pesquisar(termo: string, filtros: FiltrosCard): Card[] {
-    const t = termo.trim().toLowerCase();
-    return this.listar().filter(c =>
-      (!t || c.nome.toLowerCase().includes(t) || c.numero.toLowerCase().includes(t) || c.colecao.toLowerCase().includes(t)) &&
-      (!filtros.raridade || c.raridade === filtros.raridade) &&
-      (!filtros.tipo || c.tipo === filtros.tipo) &&
-      (!filtros.colecao || c.colecao === filtros.colecao)
+  /**
+   * Pesquisa no servidor: `q` faz a busca textual do JSON-Server e os
+   * filtros viram parâmetros da URL (ex.: /cards?q=holo&raridade=Rara).
+   */
+  pesquisar(termo: string, filtros: FiltrosCard): Observable<Card[]> {
+    let params = new HttpParams().set('_sort', 'nome');
+    if (termo.trim()) params = params.set('q', termo.trim());
+    if (filtros.raridade) params = params.set('raridade', filtros.raridade);
+    if (filtros.tipo) params = params.set('tipo', filtros.tipo);
+    if (filtros.colecao) params = params.set('colecao', filtros.colecao);
+    return this.http.get<Card[]>(this.url, { params });
+  }
+
+  listarColecoes(): Observable<string[]> {
+    return this.listar().pipe(
+      map(cards => [...new Set(cards.map(c => c.colecao))].sort())
     );
-  }
-
-  listarColecoes(): string[] {
-    return [...new Set(this.cards.map(c => c.colecao))].sort();
   }
 
   // ---------- CRUD ----------
 
-  cadastrar(card: Card): Card {
-    this.validar(card);
-    const novo: Card = {
-      ...card,
-      id: this.proximoId(),
-      dataCadastro: new Date().toISOString().slice(0, 10)
-    };
-    this.cards.push(novo);
-    return { ...novo };
+  /** Cadastra um card novo; o id é gerado pelo JSON-Server. */
+  cadastrar(dados: CardFormulario): Observable<Card> {
+    const erro = this.validar(dados);
+    if (erro) return throwError(() => new Error(erro));
+
+    return this.verificarDuplicado(dados).pipe(
+      switchMap(() => this.http.post<Card>(this.url, {
+        ...dados,
+        dataCadastro: this.hoje(),
+        historico: [{ mes: this.mesAtual(), valor: dados.preco }]
+      }))
+    );
   }
 
-  editar(card: Card): Card {
-    this.validar(card);
-    const i = this.cards.findIndex(c => c.id === card.id);
-    if (i === -1) {
-      throw new Error(`Card #${card.id} não encontrado.`);
-    }
-    this.cards[i] = { ...card };
-    return { ...card };
+  /** Edita o card e registra no histórico quando o preço muda. */
+  editar(id: number, dados: CardFormulario): Observable<Card> {
+    const erro = this.validar(dados);
+    if (erro) return throwError(() => new Error(erro));
+
+    return this.verificarDuplicado(dados, id).pipe(
+      switchMap(() => this.buscarPorId(id)),
+      switchMap(atual => this.http.put<Card>(`${this.url}/${id}`, {
+        ...atual,
+        ...dados,
+        id,
+        historico: this.registrarPreco(atual.historico ?? [], atual.preco, dados.preco)
+      }))
+    );
   }
 
-  excluir(id: number): boolean {
-    const tamanhoAntes = this.cards.length;
-    this.cards = this.cards.filter(c => c.id !== id);
-    return this.cards.length < tamanhoAntes;
+  excluir(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.url}/${id}`);
   }
 
   // ---------- Estatísticas (dashboard) ----------
 
-  /** Quantidade de cartas distintas cadastradas. */
-  total(): number {
-    return this.cards.length;
-  }
-
-  /** Soma das unidades em estoque. */
-  totalUnidades(): number {
-    return this.cards.reduce((soma, c) => soma + c.estoque, 0);
-  }
-
-  /** Valor do acervo = soma de preço × estoque. */
-  valorAcervo(): number {
-    return this.cards.reduce((soma, c) => soma + c.preco * c.estoque, 0);
-  }
-
-  contagemPorRaridade(): Contagem[] {
-    return this.raridades
-      .map(r => ({ chave: r, quantidade: this.cards.filter(c => c.raridade === r).length }))
-      .filter(item => item.quantidade > 0);
-  }
-
-  contagemPorColecao(): Contagem[] {
-    return this.listarColecoes()
-      .map(col => ({ chave: col, quantidade: this.cards.filter(c => c.colecao === col).length }))
-      .sort((a, b) => b.quantidade - a.quantidade);
-  }
-
-  maisValiosos(limite = 5): Card[] {
-    return this.listar().sort((a, b) => b.preco - a.preco).slice(0, limite);
-  }
-
-  /**
-   * Histórico simulado dos últimos 10 meses (determinístico pelo id),
-   * terminando no preço atual. Será substituído por dados da API.
-   */
-  historicoPreco(card: Card): number[] {
-    const pontos: number[] = [];
-    for (let i = 0; i < 10; i++) {
-      const oscilacao = Math.sin(card.id + i * 1.7) * 0.06;
-      const tendencia = 0.82 + i * 0.02;
-      pontos.push(Math.round(card.preco * (tendencia + oscilacao)));
-    }
-    pontos[9] = card.preco;
-    return pontos;
+  estatisticas(): Observable<EstatisticasAcervo> {
+    return this.listar().pipe(map(cards => {
+      const unidades = cards.reduce((soma, c) => soma + c.estoque, 0);
+      const valorAcervo = cards.reduce((soma, c) => soma + c.preco * c.estoque, 0);
+      return {
+        total: cards.length,
+        unidades,
+        valorAcervo,
+        ticketMedio: unidades ? valorAcervo / unidades : 0,
+        porColecao: this.contar(cards, c => c.colecao).sort((a, b) => b.quantidade - a.quantidade),
+        porRaridade: this.raridades
+          .map(r => ({ chave: r, quantidade: cards.filter(c => c.raridade === r).length }))
+          .filter(item => item.quantidade > 0),
+        maisValiosos: [...cards].sort((a, b) => b.preco - a.preco).slice(0, 5)
+      };
+    }));
   }
 
   /** Variação percentual entre o primeiro e o último ponto do histórico. */
   variacaoPreco(card: Card): number {
-    const h = this.historicoPreco(card);
-    return ((h[h.length - 1] - h[0]) / h[0]) * 100;
+    const h = card.historico ?? [];
+    if (h.length < 2 || !h[0].valor) return 0;
+    return ((h[h.length - 1].valor - h[0].valor) / h[0].valor) * 100;
   }
 
   // ---------- Regras internas ----------
 
-  private validar(card: Card): void {
-    if (!card.nome?.trim() || !card.colecao?.trim()) {
-      throw new Error('Nome e coleção são obrigatórios.');
-    }
-    if (!(card.preco > 0)) {
-      throw new Error('O preço deve ser maior que zero.');
-    }
-    if (card.estoque < 0) {
-      throw new Error('O estoque não pode ser negativo.');
-    }
+  /** Regras de negócio que valem mesmo se o formulário for burlado. */
+  private validar(card: CardFormulario): string | null {
+    if (!card.nome?.trim() || !card.colecao?.trim()) return 'Nome e coleção são obrigatórios.';
+    if (!(card.preco > 0)) return 'O preço deve ser maior que zero.';
+    if (card.estoque < 0) return 'O estoque não pode ser negativo.';
+    return null;
   }
 
-  private proximoId(): number {
-    return this.cards.length ? Math.max(...this.cards.map(c => c.id)) + 1 : 1000;
+  /** Impede dois cards com a mesma coleção e o mesmo número. */
+  private verificarDuplicado(card: CardFormulario, idIgnorado?: number): Observable<void> {
+    if (!card.numero?.trim()) {
+      return of(undefined);
+    }
+    const params = new HttpParams().set('colecao', card.colecao.trim()).set('numero', card.numero.trim());
+    return this.http.get<Card[]>(this.url, { params }).pipe(
+      map(encontrados => {
+        if (encontrados.some(c => c.id !== idIgnorado)) {
+          throw new Error(`Já existe um card nº ${card.numero} na coleção ${card.colecao}.`);
+        }
+      })
+    );
+  }
+
+  /** Atualiza o ponto do mês atual ou acrescenta um novo (mantém 12 meses). */
+  private registrarPreco(historico: PontoHistorico[], precoAntigo: number, precoNovo: number): PontoHistorico[] {
+    if (precoAntigo === precoNovo) return historico;
+    const mes = this.mesAtual();
+    const semMesAtual = historico.filter(p => p.mes !== mes);
+    return [...semMesAtual, { mes, valor: precoNovo }].slice(-12);
+  }
+
+  private contar(cards: Card[], chave: (c: Card) => string): Contagem[] {
+    const mapa = new Map<string, number>();
+    cards.forEach(c => mapa.set(chave(c), (mapa.get(chave(c)) ?? 0) + 1));
+    return [...mapa].map(([k, quantidade]) => ({ chave: k, quantidade }));
+  }
+
+  private hoje(): string {
+    return new Date().toISOString().slice(0, 10);
+  }
+
+  private mesAtual(): string {
+    return this.hoje().slice(0, 7);
   }
 }
