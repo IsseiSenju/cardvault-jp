@@ -1,0 +1,92 @@
+<main>
+  <h1>Dashboard</h1>
+  <p class="mut sub">Visão geral do acervo • dados da API em {{ hoje | date:'dd/MM/yyyy HH:mm' }}</p>
+
+  <div class="alert err" *ngIf="erro()">✕ {{ erro() }}</div>
+
+  <ng-container *ngIf="dados() as d">
+    <div class="kpis">
+      <div class="panel">
+        <div class="mut rotulo">Cartas cadastradas</div>
+        <b class="numero">{{ d.total }}</b>
+        <div class="extra">{{ d.porColecao.length }} coleções diferentes</div>
+      </div>
+      <div class="panel">
+        <div class="mut rotulo">Unidades em estoque</div>
+        <b class="numero">{{ d.unidades }}</b>
+        <div class="extra">soma do estoque de todas as cartas</div>
+      </div>
+      <div class="panel">
+        <div class="mut rotulo">Valor estimado do acervo</div>
+        <b class="numero ouro">{{ d.valorAcervo | currency:'BRL':'symbol':'1.0-0' }}</b>
+        <div class="extra">valor médio {{ d.ticketMedio | currency:'BRL' }} / unidade</div>
+      </div>
+      <div class="panel">
+        <div class="mut rotulo">Propostas pendentes</div>
+        <b class="numero">{{ pendentes() }}</b>
+        <div class="extra">{{ propostas().length }} propostas • {{ mensagens().length }} mensagens</div>
+      </div>
+    </div>
+
+    <div class="linha2">
+      <div class="panel">
+        <h2>Cartas por coleção</h2>
+        <div class="barras">
+          <div class="coluna" *ngFor="let item of d.porColecao; let primeiro = first">
+            <span class="valor">{{ item.quantidade }}</span>
+            <div class="barra" [ngStyle]="{ height: (item.quantidade / maiorColecao()) * 170 + 'px', background: primeiro ? '#E3350D' : '#2E6BE6' }"></div>
+            <span class="mut legenda">{{ item.chave }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Distribuição por raridade</h2>
+        <div class="raridade" *ngFor="let item of d.porRaridade">
+          <div class="rr-cab">
+            <span><i class="ponto" [style.background]="coresRaridade[item.chave]"></i>{{ item.chave }}</span>
+            <b>{{ item.quantidade }} • {{ percentual(item.quantidade) | number:'1.0-0' }}%</b>
+          </div>
+          <div class="trilho">
+            <div class="preenchido" [style.width.%]="percentual(item.quantidade)" [style.background]="coresRaridade[item.chave]"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="linha2">
+      <div class="panel">
+        <h2>Top 5 cartas mais valiosas</h2>
+        <table>
+          <thead><tr><th>#</th><th>Carta</th><th>Raridade</th><th>Estado</th><th>Preço</th></tr></thead>
+          <tbody>
+            <tr *ngFor="let card of d.maisValiosos; let i = index" (click)="abrir(card)" class="clicavel">
+              <td>{{ i + 1 }}º</td>
+              <td><i class="mini art" [ngClass]="card.gradiente"></i><b>{{ card.nome }}</b></td>
+              <td>{{ card.raridade }}</td>
+              <td>{{ card.estado | conservacao }}</td>
+              <td class="ouro"><b>{{ card.preco | currency:'BRL' }}</b></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="panel">
+        <h2>Propostas recebidas</h2>
+        <p class="mut" *ngIf="propostas().length === 0">Nenhuma proposta até o momento.</p>
+        <div class="proposta" *ngFor="let p of propostas()">
+          <div class="p-cab">
+            <a [routerLink]="['/cards', p.cardId]"><b>{{ p.cardNome }}</b></a>
+            <span class="tag" [ngClass]="{ gold: p.status === 'pendente', ok: p.status === 'aceita', red: p.status === 'recusada' }">{{ p.status }}</span>
+          </div>
+          <div class="mut">{{ p.nome }} • {{ p.data | date:'dd/MM/yyyy' }} • <b class="ouro">{{ p.valorOferecido | currency:'BRL' }}</b></div>
+          <div class="mut msg" *ngIf="p.mensagem">“{{ p.mensagem }}”</div>
+          <div class="p-acoes" *ngIf="p.status === 'pendente'">
+            <button class="btn sm" (click)="responder(p, 'aceita')">✓ Aceitar</button>
+            <button class="btn g sm" (click)="responder(p, 'recusada')">✕ Recusar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</main>
