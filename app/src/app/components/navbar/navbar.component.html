@@ -9,7 +9,7 @@
   </a>
 
   <ul>
-    <li *ngFor="let link of links">
+    <li *ngFor="let link of linksVisiveis">
       <a [routerLink]="link.rota" routerLinkActive="on">{{ link.texto }}</a>
     </li>
 
@@ -17,7 +17,7 @@
       <a class="btn" routerLink="/login" routerLinkActive="ativo">Login</a>
     </li>
     <li *ngIf="auth.estaLogado()" class="usuario">
-      <span class="tag" [ngClass]="auth.isAdmin() ? 'gold' : 'ok'">{{ auth.usuario?.nome }}</span>
+      <span class="tag" [ngClass]="auth.isAdmin() ? 'gold' : 'ok'">{{ auth.usuario()?.nome }}</span>
       <button class="btn g sm" (click)="sair()">Sair</button>
     </li>
   </ul>
