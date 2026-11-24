@@ -1,0 +1,141 @@
+<main>
+  <div class="topo">
+    <div>
+      <span class="tag gold">🛡 Área do Administrador</span>
+      <h1>Cadastro de Cards</h1>
+    </div>
+    <button class="btn" (click)="novo()">+ Novo card</button>
+  </div>
+
+  <div class="layout">
+    <!-- Formulário reativo de inclusão / edição -->
+    <form class="panel" [formGroup]="form" (ngSubmit)="salvar()" novalidate>
+      <div class="cab-form">
+        <h2>{{ editandoId() ? 'Editar card #' + editandoId() : 'Incluir novo card' }}</h2>
+        <div class="art previa" [ngClass]="form.value.gradiente ?? 'g1'"><span>{{ form.value.nome || 'Prévia' }}</span></div>
+      </div>
+
+      <div [class.err]="invalido('nome')" [class.okf]="valido('nome')">
+        <label for="nome">Nome da carta *</label>
+        <input id="nome" formControlName="nome">
+        <small *ngIf="invalido('nome') && erro('nome', 'required')">✕ Campo obrigatório</small>
+        <small *ngIf="invalido('nome') && erro('nome', 'minlength')">✕ Mínimo de 3 caracteres</small>
+        <small *ngIf="invalido('nome') && erro('nome', 'maxlength')">✕ Máximo de 60 caracteres</small>
+        <small *ngIf="invalido('nome') && erro('nome', 'vazio')">✕ O nome não pode ter só espaços</small>
+        <small *ngIf="valido('nome')">✓ OK</small>
+      </div>
+
+      <div class="duas">
+        <div [class.err]="invalido('colecao')" [class.okf]="valido('colecao')">
+          <label for="colecao">Coleção *</label>
+          <input id="colecao" list="lista-colecoes" formControlName="colecao" placeholder="Selecione ou digite...">
+          <datalist id="lista-colecoes">
+            <option *ngFor="let c of colecoes()" [value]="c"></option>
+          </datalist>
+          <small *ngIf="invalido('colecao')">✕ Campo obrigatório</small>
+        </div>
+        <div [class.err]="invalido('numero')" [class.okf]="valido('numero') && form.value.numero">
+          <label for="numero">Número</label>
+          <input id="numero" formControlName="numero" placeholder="006/102">
+          <small *ngIf="invalido('numero')">✕ Formato: 006/102 ou P-031</small>
+        </div>
+
+        <div>
+          <label for="raridade">Raridade *</label>
+          <select id="raridade" formControlName="raridade">
+            <option *ngFor="let r of raridades" [value]="r">{{ r }}</option>
+          </select>
+        </div>
+        <div>
+          <label for="tipo">Tipo *</label>
+          <select id="tipo" formControlName="tipo">
+            <option *ngFor="let t of tipos" [value]="t">{{ t }}</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="idioma">Idioma *</label>
+          <select id="idioma" formControlName="idioma">
+            <option *ngFor="let i of idiomas" [value]="i">{{ i }}</option>
+          </select>
+        </div>
+        <div>
+          <label for="estado">Estado *</label>
+          <select id="estado" formControlName="estado">
+            <option *ngFor="let e of estados" [value]="e">{{ e | conservacao }}</option>
+          </select>
+        </div>
+
+        <div [class.err]="invalido('preco')" [class.okf]="valido('preco')">
+          <label for="preco">Preço (R$) *</label>
+          <input id="preco" type="number" step="0.01" formControlName="preco">
+          <small *ngIf="invalido('preco')">✕ Deve ser maior que zero</small>
+          <small *ngIf="valido('preco')">✓ {{ form.value.preco | currency:'BRL' }}</small>
+        </div>
+        <div [class.err]="invalido('estoque')" [class.okf]="valido('estoque')">
+          <label for="estoque">Estoque *</label>
+          <input id="estoque" type="number" formControlName="estoque">
+          <small *ngIf="invalido('estoque') && erro('estoque', 'pattern')">✕ Use um número inteiro</small>
+          <small *ngIf="invalido('estoque') && !erro('estoque', 'pattern')">✕ Não pode ser negativo</small>
+        </div>
+
+        <div [class.err]="invalido('variante')">
+          <label for="variante">Variante / Edição</label>
+          <input id="variante" formControlName="variante" placeholder="Holo • 1ª Edição">
+          <small *ngIf="invalido('variante')">✕ Máximo de 40 caracteres</small>
+        </div>
+        <div [class.err]="invalido('ano')" [class.okf]="valido('ano')">
+          <label for="ano">Ano *</label>
+          <input id="ano" type="number" formControlName="ano">
+          <small *ngIf="invalido('ano')">✕ Entre 1996 e {{ anoAtual }}</small>
+        </div>
+      </div>
+
+      <label>Arte (gradiente)</label>
+      <div class="gradientes">
+        <button type="button" *ngFor="let g of gradientes" class="swatch" [ngClass]="g" [class.sel]="form.value.gradiente === g"
+                (click)="form.controls.gradiente.setValue(g)" [attr.aria-label]="'Gradiente ' + g"></button>
+      </div>
+
+      <div class="alert" *ngIf="mensagem()" [ngClass]="tipoMensagem()">{{ mensagem() }}</div>
+
+      <div class="botoes">
+        <button type="submit" class="btn" [disabled]="salvando()">
+          {{ salvando() ? 'Salvando...' : (editandoId() ? 'Salvar alterações' : 'Salvar card') }}
+        </button>
+        <button type="button" class="btn g" (click)="novo()">Cancelar</button>
+      </div>
+    </form>
+
+    <!-- Tabela de cards cadastrados (GET /cards) -->
+    <div class="panel">
+      <div class="cab-tabela">
+        <h2>Cards cadastrados <span class="mut">({{ cards().length }})</span></h2>
+        <input placeholder="🔍 Filtrar..." [formControl]="filtroTabela" aria-label="Filtrar tabela">
+      </div>
+
+      <table>
+        <thead>
+          <tr><th>ID</th><th>Nome</th><th>Coleção</th><th>Raridade</th><th>Preço</th><th>Estoque</th><th>Ações</th></tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let card of cards()" [ngClass]="{ editando: editandoId() === card.id }">
+            <td>#{{ card.id }}</td>
+            <td><a [routerLink]="['/cards', card.id]"><b>{{ card.nome }}</b></a></td>
+            <td>{{ card.colecao }}</td>
+            <td><span class="tag" [ngClass]="classeRaridade(card.raridade)">{{ card.raridade }}</span></td>
+            <td>{{ card.preco | currency:'BRL':'symbol':'1.0-0' }}</td>
+            <td [ngStyle]="{ color: card.estoque === 0 ? '#ff7a5c' : 'inherit' }">{{ card.estoque }}</td>
+            <td class="acoes">
+              <button class="btn g sm" (click)="iniciarEdicao(card.id)">✎ Editar</button>
+              <button class="btn sm" (click)="excluir(card)">🗑 Excluir</button>
+            </td>
+          </tr>
+          <tr *ngIf="cards().length === 0">
+            <td colspan="7" class="mut">Nenhum card encontrado.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</main>
