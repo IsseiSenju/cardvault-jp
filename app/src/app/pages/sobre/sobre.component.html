@@ -11,7 +11,7 @@
       <p class="mut texto">Oferecer transparência na avaliação de cartas colecionáveis, com histórico de preço, estado de conservação padronizado e negociação segura entre colecionadores.</p>
 
       <div class="numeros">
-        <div class="panel"><b>{{ totalCartas }}</b><div class="mut">unidades no acervo</div></div>
+        <div class="panel"><b>{{ totalCartas() }}</b><div class="mut">unidades no acervo</div></div>
         <div class="panel"><b>3.400+</b><div class="mut">colecionadores</div></div>
         <div class="panel"><b>98%</b><div class="mut">avaliações positivas</div></div>
       </div>
@@ -22,33 +22,34 @@
       </div>
     </div>
 
-    <form class="panel contato" #fc="ngForm" (ngSubmit)="enviar(fc)" novalidate>
+    <form class="panel contato" [formGroup]="contato" (ngSubmit)="enviar()" novalidate>
       <h2 class="contato-titulo">Fale conosco</h2>
       <p class="mut">Responderemos em até 2 dias úteis.</p>
 
-      <div class="alert ok" *ngIf="enviadoPara">✓ Obrigado, {{ enviadoPara }}! Sua mensagem foi enviada.</div>
+      <div class="alert ok" *ngIf="enviadoPara()">✓ Obrigado, {{ enviadoPara() }}! Sua mensagem foi enviada.</div>
 
-      <div [ngClass]="{ err: no.invalid && no.touched, okf: no.valid && no.touched }">
+      <div [class.err]="invalido(contato.controls.nome)" [class.okf]="contato.controls.nome.valid && contato.controls.nome.touched">
         <label for="nome">Nome *</label>
-        <input id="nome" name="nome" [(ngModel)]="contato.nome" #no="ngModel" required>
-        <small *ngIf="no.invalid && no.touched">✕ Campo obrigatório</small>
-        <small *ngIf="no.valid && no.touched">✓ OK</small>
+        <input id="nome" formControlName="nome">
+        <small *ngIf="invalido(contato.controls.nome)">✕ Informe seu nome (mín. 3 caracteres)</small>
+        <small *ngIf="contato.controls.nome.valid && contato.controls.nome.touched">✓ OK</small>
       </div>
-      <div [ngClass]="{ err: em.invalid && em.touched }">
+      <div [class.err]="invalido(contato.controls.email)" [class.okf]="contato.controls.email.valid && contato.controls.email.touched">
         <label for="email">E-mail *</label>
-        <input id="email" name="email" type="email" [(ngModel)]="contato.email" #em="ngModel" required email pattern="[^@ ]+@[^@ ]+[.][^@ ]+">
-        <small *ngIf="em.invalid && em.touched">✕ Informe um e-mail válido</small>
+        <input id="email" type="email" formControlName="email">
+        <small *ngIf="invalido(contato.controls.email)">✕ Informe um e-mail válido</small>
       </div>
       <label for="assunto">Assunto</label>
-      <select id="assunto" name="assunto" [(ngModel)]="contato.assunto">
+      <select id="assunto" formControlName="assunto">
         <option *ngFor="let a of assuntos" [value]="a">{{ a }}</option>
       </select>
-      <div [ngClass]="{ err: me.invalid && me.touched }">
-        <label for="mensagem">Mensagem * <span class="mut">({{ contato.mensagem.length }}/500)</span></label>
-        <textarea id="mensagem" name="mensagem" rows="6" maxlength="500" [(ngModel)]="contato.mensagem" #me="ngModel" required minlength="10"></textarea>
-        <small *ngIf="me.invalid && me.touched">✕ Escreva ao menos 10 caracteres</small>
+      <div [class.err]="invalido(contato.controls.mensagem)">
+        <label for="mensagem">Mensagem * <span class="mut">({{ contato.value.mensagem?.length ?? 0 }}/500)</span></label>
+        <textarea id="mensagem" rows="6" maxlength="500" formControlName="mensagem"></textarea>
+        <small *ngIf="invalido(contato.controls.mensagem)">✕ Escreva ao menos 10 caracteres</small>
       </div>
-      <button type="submit" class="btn largo">Enviar mensagem</button>
+      <div class="alert err" *ngIf="erro()">✕ {{ erro() }}</div>
+      <button type="submit" class="btn largo" [disabled]="enviando()">{{ enviando() ? 'Enviando...' : 'Enviar mensagem' }}</button>
       <p class="mut local">📍 Belo Horizonte - MG • ✉ contato&#64;cardvault.jp</p>
     </form>
   </div>
