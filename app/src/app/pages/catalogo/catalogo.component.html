@@ -2,40 +2,45 @@
   <div class="topo">
     <div>
       <h1>Catálogo</h1>
-      <p class="mut">{{ totalAcervo }} cartas no acervo • exibindo {{ cards.length }}</p>
+      <p class="mut">{{ totalAcervo() }} cartas no acervo • exibindo {{ cards().length }}</p>
     </div>
 
-    <div class="filtros">
-      <input class="busca" placeholder="🔍  Buscar por nome, número ou coleção..."
-             [(ngModel)]="termo" (ngModelChange)="filtrar()">
+    <form class="filtros" [formGroup]="filtros">
+      <input class="busca" formControlName="termo" placeholder="🔍  Buscar por nome, número ou coleção..." aria-label="Buscar">
 
-      <select [(ngModel)]="filtros.raridade" (ngModelChange)="filtrar()">
+      <select formControlName="raridade" aria-label="Raridade">
         <option value="">Raridade: Todas</option>
         <option *ngFor="let r of raridades" [value]="r">{{ r }}</option>
       </select>
 
-      <select [(ngModel)]="filtros.tipo" (ngModelChange)="filtrar()">
+      <select formControlName="tipo" aria-label="Tipo">
         <option value="">Tipo: Todos</option>
         <option *ngFor="let t of tipos" [value]="t">{{ t }}</option>
       </select>
 
-      <select [(ngModel)]="filtros.colecao" (ngModelChange)="filtrar()">
+      <select formControlName="colecao" aria-label="Coleção">
         <option value="">Coleção: Todas</option>
-        <option *ngFor="let c of colecoes" [value]="c">{{ c }}</option>
+        <option *ngFor="let c of colecoes()" [value]="c">{{ c }}</option>
       </select>
-    </div>
+    </form>
   </div>
 
   <div class="ativos" *ngIf="temFiltroAtivo">
-    <span class="tag" *ngIf="termo">Busca: "{{ termo }}"</span>
-    <span class="tag gold clicavel" *ngIf="filtros.raridade" (click)="limparFiltro('raridade')">{{ filtros.raridade }} ✕</span>
-    <span class="tag red clicavel" *ngIf="filtros.tipo" (click)="limparFiltro('tipo')">{{ filtros.tipo }} ✕</span>
-    <span class="tag clicavel" *ngIf="filtros.colecao" (click)="limparFiltro('colecao')">{{ filtros.colecao }} ✕</span>
+    <span class="tag" *ngIf="filtros.value.termo">Busca: "{{ filtros.value.termo }}"</span>
+    <span class="tag gold clicavel" *ngIf="filtros.value.raridade" (click)="limparFiltro('raridade')">{{ filtros.value.raridade }} ✕</span>
+    <span class="tag red clicavel" *ngIf="filtros.value.tipo" (click)="limparFiltro('tipo')">{{ filtros.value.tipo }} ✕</span>
+    <span class="tag clicavel" *ngIf="filtros.value.colecao" (click)="limparFiltro('colecao')">{{ filtros.value.colecao }} ✕</span>
     <button class="btn g sm" (click)="limparTudo()">Limpar filtros</button>
   </div>
 
-  <div class="grade" *ngIf="cards.length > 0; else vazio">
-    <div class="card" *ngFor="let card of cards" (click)="abrirDetalhe(card)" [title]="'Ver detalhes de ' + card.nome">
+  <div class="alert err" *ngIf="erro()">✕ {{ erro() }}</div>
+
+  <div class="panel vazio" *ngIf="carregando() && cards().length === 0">
+    <p class="mut">Carregando cards da API...</p>
+  </div>
+
+  <div class="grade" *ngIf="cards().length > 0; else vazio">
+    <div class="card" *ngFor="let card of cards()" (click)="abrirDetalhe(card)" [title]="'Ver detalhes de ' + card.nome">
       <div class="art" [ngClass]="card.gradiente"><span>{{ card.nome }}</span></div>
       <div class="info">
         <b class="nome">{{ card.nome }}</b>
@@ -49,7 +54,7 @@
   </div>
 
   <ng-template #vazio>
-    <div class="panel vazio">
+    <div class="panel vazio" *ngIf="!carregando()">
       <h2>Nenhum card encontrado</h2>
       <p class="mut">Ajuste a busca ou os filtros para ver outros cards.</p>
     </div>
