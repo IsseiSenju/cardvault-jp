@@ -1,0 +1,730 @@
+{
+  "cards": [
+    {
+      "id": 1000,
+      "nome": "Pyrodrake Kasumi Holo",
+      "colecao": "Origem JP",
+      "numero": "006/102",
+      "tipo": "Fogo",
+      "raridade": "Ultra Rara",
+      "idioma": "Japonês",
+      "variante": "Holo • 1ª Edição",
+      "estado": "NM",
+      "preco": 2450,
+      "estoque": 2,
+      "ano": 1996,
+      "gradiente": "g1",
+      "dataCadastro": "2026-08-12",
+      "historico": [
+        {
+          "mes": "2026-02",
+          "valor": 2131
+        },
+        {
+          "mes": "2026-03",
+          "valor": 2124
+        },
+        {
+          "mes": "2026-04",
+          "valor": 1968
+        },
+        {
+          "mes": "2026-05",
+          "valor": 2125
+        },
+        {
+          "mes": "2026-06",
+          "valor": 2352
+        },
+        {
+          "mes": "2026-07",
+          "valor": 2247
+        },
+        {
+          "mes": "2026-08",
+          "valor": 2158
+        },
+        {
+          "mes": "2026-09",
+          "valor": 2396
+        },
+        {
+          "mes": "2026-10",
+          "valor": 2534
+        },
+        {
+          "mes": "2026-11",
+          "valor": 2450
+        }
+      ]
+    },
+    {
+      "id": 1001,
+      "nome": "Marelion Neo Promo",
+      "colecao": "Neo Aurora JP",
+      "numero": "P-031",
+      "tipo": "Água",
+      "raridade": "Promo",
+      "idioma": "Japonês",
+      "variante": "Promo",
+      "estado": "EX",
+      "preco": 380,
+      "estoque": 4,
+      "ano": 2000,
+      "gradiente": "g2",
+      "dataCadastro": "2026-08-15",
+      "historico": [
+        {
+          "mes": "2026-02",
+          "valor": 333
+        },
+        {
+          "mes": "2026-03",
+          "valor": 308
+        },
+        {
+          "mes": "2026-04",
+          "valor": 309
+        },
+        {
+          "mes": "2026-05",
+          "valor": 351
+        },
+        {
+          "mes": "2026-06",
+          "valor": 356
+        },
+        {
+          "mes": "2026-07",
+          "valor": 330
+        },
+        {
+          "mes": "2026-08",
+          "valor": 348
+        },
+        {
+          "mes": "2026-09",
+          "valor": 387
+        },
+        {
+          "mes": "2026-10",
+          "valor": 375
+        },
+        {
+          "mes": "2026-11",
+          "valor": 380
+        }
+      ]
+    },
+    {
+      "id": 1002,
+      "nome": "Voltilo Tribute",
+      "colecao": "Promo Card JP",
+      "numero": "P-001",
+      "tipo": "Elétrico",
+      "raridade": "Secreta",
+      "idioma": "Japonês",
+      "variante": "Full Art",
+      "estado": "M",
+      "preco": 5900,
+      "estoque": 1,
+      "ano": 1998,
+      "gradiente": "g3",
+      "dataCadastro": "2026-08-20",
+      "historico": [
+        {
+          "mes": "2026-02",
+          "valor": 4897
+        },
+        {
+          "mes": "2026-03",
+          "valor": 4602
+        },
+        {
+          "mes": "2026-04",
+          "valor": 5106
+        },
+        {
+          "mes": "2026-05",
+          "valor": 5538
+        },
+        {
+          "mes": "2026-06",
+          "valor": 5189
+        },
+        {
+          "mes": "2026-07",
+          "valor": 5114
+        },
+        {
+          "mes": "2026-08",
+          "valor": 5748
+        },
+        {
+          "mes": "2026-09",
+          "valor": 5926
+        },
+        {
+          "mes": "2026-10",
+          "valor": 5512
+        },
+        {
+          "mes": "2026-11",
+          "valor": 5900
+        }
+      ]
+    },
+    {
+      "id": 1003,
+      "nome": "Brotoleaf Vending",
+      "colecao": "Série Vending",
+      "numero": "V-014",
+      "tipo": "Planta",
+      "raridade": "Comum",
+      "idioma": "Japonês",
+      "variante": "Normal",
+      "estado": "NM",
+      "preco": 120,
+      "estoque": 12,
+      "ano": 1998,
+      "gradiente": "g4",
+      "dataCadastro": "2026-08-22",
+      "historico": [
+        {
+          "mes": "2026-02",
+          "valor": 93
+        },
+        {
+          "mes": "2026-03",
+          "valor": 97
+        },
+        {
+          "mes": "2026-04",
+          "valor": 110
+        },
+        {
+          "mes": "2026-05",
+          "valor": 108
+        },
+        {
+          "mes": "2026-06",
+          "valor": 101
+        },
+        {
+          "mes": "2026-07",
+          "valor": 110
+        },
+        {
+          "mes": "2026-08",
+          "valor": 120
+        },
+        {
+          "mes": "2026-09",
+          "valor": 114
+        },
+        {
+          "mes": "2026-10",
+          "valor": 111
+        },
+        {
+          "mes": "2026-11",
+          "valor": 120
+        }
+      ]
+    },
+    {
+      "id": 1004,
+      "nome": "Psymora Gold",
+      "colecao": "Série VS",
+      "numero": "045/141",
+      "tipo": "Psíquico",
+      "raridade": "Ultra Rara",
+      "idioma": "Japonês",
+      "variante": "Gold Star",
+      "estado": "NM",
+      "preco": 1780,
+      "estoque": 2,
+      "ano": 2001,
+      "gradiente": "g5",
+      "dataCadastro": "2026-09-01",
+      "historico": [
+        {
+          "mes": "2026-02",
+          "valor": 1356
+        },
+        {
+          "mes": "2026-03",
+          "valor": 1536
+        },
+        {
+          "mes": "2026-04",
+          "valor": 1624
+        },
+        {
+          "mes": "2026-05",
+          "valor": 1502
+        },
+        {
+          "mes": "2026-06",
+          "valor": 1526
+        },
+        {
+          "mes": "2026-07",
+          "valor": 1722
+        },
+        {
+          "mes": "2026-08",
+          "valor": 1728
+        },
+        {
+          "mes": "2026-09",
+          "valor": 1611
+        },
+        {
+          "mes": "2026-10",
+          "valor": 1715
+        },
+        {
+          "mes": "2026-11",
+          "valor": 1780
+        }
+      ]
+    },
+    {
+      "id": 1005,
+      "nome": "Lullafae Song Holo",
+      "colecao": "Ginásio Heroico JP",
+      "numero": "054/132",
+      "tipo": "Fada",
+      "raridade": "Rara",
+      "idioma": "Japonês",
+      "variante": "Holo",
+      "estado": "EX",
+      "preco": 260,
+      "estoque": 6,
+      "ano": 2000,
+      "gradiente": "g6",
+      "dataCadastro": "2026-09-03",
+      "historico": [
+        {
+          "mes": "2026-02",
+          "valor": 208
+        },
+        {
+          "mes": "2026-03",
+          "valor": 234
+        },
+        {
+          "mes": "2026-04",
+          "valor": 224
+        },
+        {
+          "mes": "2026-05",
+          "valor": 213
+        },
+        {
+          "mes": "2026-06",
+          "valor": 237
+        },
+        {
+          "mes": "2026-07",
+          "valor": 254
+        },
+        {
+          "mes": "2026-08",
+          "valor": 237
+        },
+        {
+          "mes": "2026-09",
+          "valor": 237
+        },
+        {
+          "mes": "2026-10",
+          "valor": 265
+        },
+        {
+          "mes": "2026-11",
+          "valor": 260
+        }
+      ]
+    },
+    {
+      "id": 1006,
+      "nome": "Emberfox Ember",
+      "colecao": "Origem JP",
+      "numero": "012/102",
+      "tipo": "Fogo",
+      "raridade": "Rara",
+      "idioma": "Japonês",
+      "variante": "Holo",
+      "estado": "GD",
+      "preco": 410,
+      "estoque": 3,
+      "ano": 1996,
+      "gradiente": "g1",
+      "dataCadastro": "2026-09-10",
+      "historico": [
+        {
+          "mes": "2026-02",
+          "valor": 352
+        },
+        {
+          "mes": "2026-03",
+          "valor": 361
+        },
+        {
+          "mes": "2026-04",
+          "valor": 333
+        },
+        {
+          "mes": "2026-05",
+          "valor": 349
+        },
+        {
+          "mes": "2026-06",
+          "valor": 392
+        },
+        {
+          "mes": "2026-07",
+          "valor": 383
+        },
+        {
+          "mes": "2026-08",
+          "valor": 361
+        },
+        {
+          "mes": "2026-09",
+          "valor": 394
+        },
+        {
+          "mes": "2026-10",
+          "valor": 426
+        },
+        {
+          "mes": "2026-11",
+          "valor": 410
+        }
+      ]
+    },
+    {
+      "id": 1007,
+      "nome": "Tidalserp Tidal",
+      "colecao": "Eclipse Sombrio JP",
+      "numero": "008/082",
+      "tipo": "Água",
+      "raridade": "Ultra Rara",
+      "idioma": "Japonês",
+      "variante": "Holo • Sombrio",
+      "estado": "NM",
+      "preco": 990,
+      "estoque": 2,
+      "ano": 1997,
+      "gradiente": "g2",
+      "dataCadastro": "2026-09-14",
+      "historico": [
+        {
+          "mes": "2026-02",
+          "valor": 871
+        },
+        {
+          "mes": "2026-03",
+          "valor": 817
+        },
+        {
+          "mes": "2026-04",
+          "valor": 796
+        },
+        {
+          "mes": "2026-05",
+          "valor": 900
+        },
+        {
+          "mes": "2026-06",
+          "valor": 939
+        },
+        {
+          "mes": "2026-07",
+          "valor": 870
+        },
+        {
+          "mes": "2026-08",
+          "valor": 893
+        },
+        {
+          "mes": "2026-09",
+          "valor": 1001
+        },
+        {
+          "mes": "2026-10",
+          "valor": 994
+        },
+        {
+          "mes": "2026-11",
+          "valor": 990
+        }
+      ]
+    },
+    {
+      "id": 1008,
+      "nome": "Thundrat Thunder Gold",
+      "colecao": "Série-e JP",
+      "numero": "101/088",
+      "tipo": "Elétrico",
+      "raridade": "Secreta",
+      "idioma": "Japonês",
+      "variante": "Crystal",
+      "estado": "M",
+      "preco": 1250,
+      "estoque": 1,
+      "ano": 2002,
+      "gradiente": "g3",
+      "dataCadastro": "2026-09-20",
+      "historico": [
+        {
+          "mes": "2026-02",
+          "valor": 1058
+        },
+        {
+          "mes": "2026-03",
+          "valor": 979
+        },
+        {
+          "mes": "2026-04",
+          "valor": 1061
+        },
+        {
+          "mes": "2026-05",
+          "valor": 1175
+        },
+        {
+          "mes": "2026-06",
+          "valor": 1120
+        },
+        {
+          "mes": "2026-07",
+          "valor": 1076
+        },
+        {
+          "mes": "2026-08",
+          "valor": 1199
+        },
+        {
+          "mes": "2026-09",
+          "valor": 1267
+        },
+        {
+          "mes": "2026-10",
+          "valor": 1184
+        },
+        {
+          "mes": "2026-11",
+          "valor": 1250
+        }
+      ]
+    },
+    {
+      "id": 1009,
+      "nome": "Florabeast Bloom",
+      "colecao": "Origem JP",
+      "numero": "015/102",
+      "tipo": "Planta",
+      "raridade": "Rara",
+      "idioma": "Japonês",
+      "variante": "Holo",
+      "estado": "EX",
+      "preco": 640,
+      "estoque": 3,
+      "ano": 1996,
+      "gradiente": "g4",
+      "dataCadastro": "2026-10-02",
+      "historico": [
+        {
+          "mes": "2026-02",
+          "valor": 505
+        },
+        {
+          "mes": "2026-03",
+          "valor": 508
+        },
+        {
+          "mes": "2026-04",
+          "valor": 578
+        },
+        {
+          "mes": "2026-05",
+          "valor": 586
+        },
+        {
+          "mes": "2026-06",
+          "valor": 542
+        },
+        {
+          "mes": "2026-07",
+          "valor": 575
+        },
+        {
+          "mes": "2026-08",
+          "valor": 639
+        },
+        {
+          "mes": "2026-09",
+          "valor": 619
+        },
+        {
+          "mes": "2026-10",
+          "valor": 589
+        },
+        {
+          "mes": "2026-11",
+          "valor": 640
+        }
+      ]
+    },
+    {
+      "id": 1010,
+      "nome": "Umbrashade Shadow Holo",
+      "colecao": "Neo Aurora JP",
+      "numero": "094/105",
+      "tipo": "Psíquico",
+      "raridade": "Ultra Rara",
+      "idioma": "Japonês",
+      "variante": "Holo • Reverse",
+      "estado": "NM",
+      "preco": 1120,
+      "estoque": 2,
+      "ano": 2001,
+      "gradiente": "g5",
+      "dataCadastro": "2026-10-11",
+      "historico": [
+        {
+          "mes": "2026-02",
+          "valor": 851
+        },
+        {
+          "mes": "2026-03",
+          "valor": 948
+        },
+        {
+          "mes": "2026-04",
+          "valor": 1029
+        },
+        {
+          "mes": "2026-05",
+          "valor": 962
+        },
+        {
+          "mes": "2026-06",
+          "valor": 949
+        },
+        {
+          "mes": "2026-07",
+          "valor": 1070
+        },
+        {
+          "mes": "2026-08",
+          "valor": 1102
+        },
+        {
+          "mes": "2026-09",
+          "valor": 1023
+        },
+        {
+          "mes": "2026-10",
+          "valor": 1062
+        },
+        {
+          "mes": "2026-11",
+          "valor": 1120
+        }
+      ]
+    },
+    {
+      "id": 1011,
+      "nome": "Lunapix Moonlight",
+      "colecao": "Ginásio Heroico JP",
+      "numero": "088/132",
+      "tipo": "Fada",
+      "raridade": "Comum",
+      "idioma": "Japonês",
+      "variante": "Normal",
+      "estado": "PL",
+      "preco": 90,
+      "estoque": 15,
+      "ano": 2000,
+      "gradiente": "g6",
+      "dataCadastro": "2026-10-25",
+      "historico": [
+        {
+          "mes": "2026-02",
+          "valor": 71
+        },
+        {
+          "mes": "2026-03",
+          "valor": 80
+        },
+        {
+          "mes": "2026-04",
+          "valor": 79
+        },
+        {
+          "mes": "2026-05",
+          "valor": 74
+        },
+        {
+          "mes": "2026-06",
+          "valor": 81
+        },
+        {
+          "mes": "2026-07",
+          "valor": 88
+        },
+        {
+          "mes": "2026-08",
+          "valor": 84
+        },
+        {
+          "mes": "2026-09",
+          "valor": 81
+        },
+        {
+          "mes": "2026-10",
+          "valor": 91
+        },
+        {
+          "mes": "2026-11",
+          "valor": 90
+        }
+      ]
+    }
+  ],
+  "usuarios": [
+    {
+      "id": 1,
+      "nome": "Kaique (cliente)",
+      "email": "cliente@cardvault.jp",
+      "senha": "cliente123",
+      "perfil": "cliente"
+    },
+    {
+      "id": 2,
+      "nome": "Kaique (admin)",
+      "email": "admin@cardvault.jp",
+      "senha": "admin1234",
+      "perfil": "admin"
+    }
+  ],
+  "propostas": [
+    {
+      "id": 1,
+      "cardId": 1002,
+      "cardNome": "Voltilo Tribute",
+      "nome": "Kaique (cliente)",
+      "email": "cliente@cardvault.jp",
+      "valorOferecido": 5200,
+      "mensagem": "Tenho interesse, aceito retirar em BH.",
+      "status": "pendente",
+      "data": "2026-11-20"
+    }
+  ],
+  "mensagens": []
+}
