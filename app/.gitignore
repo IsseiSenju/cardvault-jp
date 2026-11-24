@@ -42,3 +42,6 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+# Base de dados do JSON-Server (gerada a partir de api/db.seed.json)
+/api/db.json
