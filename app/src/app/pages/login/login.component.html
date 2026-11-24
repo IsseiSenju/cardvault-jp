@@ -13,69 +13,76 @@
 
     <div class="panel caixa">
       <div class="abas">
-        <div [ngClass]="{ ativa: aba === 'entrar' }" (click)="trocarAba('entrar')">Entrar</div>
-        <div [ngClass]="{ ativa: aba === 'cadastrar' }" (click)="trocarAba('cadastrar')">Cadastrar</div>
+        <div [ngClass]="{ ativa: aba() === 'entrar' }" (click)="trocarAba('entrar')">Entrar</div>
+        <div [ngClass]="{ ativa: aba() === 'cadastrar' }" (click)="trocarAba('cadastrar')">Cadastrar</div>
       </div>
 
-      <!-- Aba Entrar -->
-      <form *ngIf="aba === 'entrar'" #fl="ngForm" (ngSubmit)="entrar(fl)" novalidate>
-        <div class="alert ok" *ngIf="sucessoCadastro">✓ {{ sucessoCadastro }}</div>
+      <!-- Aba Entrar (formulário reativo) -->
+      <form *ngIf="aba() === 'entrar'" [formGroup]="loginForm" (ngSubmit)="entrar()" novalidate>
+        <div class="alert ok" *ngIf="sucessoCadastro()">✓ {{ sucessoCadastro() }}</div>
 
         <label>Perfil de acesso</label>
         <div class="perfis">
-          <button type="button" class="btn" [ngClass]="{ g: perfil !== 'cliente' }" (click)="perfil = 'cliente'">👤 Cliente</button>
-          <button type="button" class="btn" [ngClass]="{ g: perfil !== 'admin' }" (click)="perfil = 'admin'">🛡 Administrador</button>
+          <button type="button" class="btn" [ngClass]="{ g: loginForm.value.perfil !== 'cliente' }" (click)="loginForm.controls.perfil.setValue('cliente')">👤 Cliente</button>
+          <button type="button" class="btn" [ngClass]="{ g: loginForm.value.perfil !== 'admin' }" (click)="loginForm.controls.perfil.setValue('admin')">🛡 Administrador</button>
         </div>
 
-        <div [ngClass]="{ err: em.invalid && em.touched, okf: em.valid && em.touched }">
+        <div [class.err]="invalido(loginForm.controls.email)" [class.okf]="loginForm.controls.email.valid && loginForm.controls.email.touched">
           <label for="email">E-mail</label>
-          <input id="email" name="email" type="email" [(ngModel)]="email" #em="ngModel" required email pattern="[^@ ]+@[^@ ]+[.][^@ ]+" placeholder="voce@email.com">
-          <small *ngIf="em.invalid && em.touched">✕ Informe um e-mail válido</small>
-          <small *ngIf="em.valid && em.touched">✓ E-mail válido</small>
+          <input id="email" type="email" formControlName="email" placeholder="voce@email.com">
+          <small *ngIf="invalido(loginForm.controls.email)">✕ Informe um e-mail válido</small>
+          <small *ngIf="loginForm.controls.email.valid && loginForm.controls.email.touched">✓ E-mail válido</small>
         </div>
 
-        <div [ngClass]="{ err: se.invalid && se.touched }">
+        <div [class.err]="invalido(loginForm.controls.senha)">
           <label for="senha">Senha</label>
-          <input id="senha" name="senha" type="password" [(ngModel)]="senha" #se="ngModel" required minlength="8">
-          <small *ngIf="se.invalid && se.touched">✕ A senha deve ter no mínimo 8 caracteres</small>
+          <input id="senha" type="password" formControlName="senha">
+          <small *ngIf="invalido(loginForm.controls.senha)">✕ A senha deve ter no mínimo 8 caracteres</small>
         </div>
 
         <div class="extras">
-          <label class="check"><input type="checkbox" name="lembrar" [(ngModel)]="lembrar"> Lembrar de mim</label>
+          <label class="check"><input type="checkbox" formControlName="lembrar"> Lembrar de mim</label>
           <a class="link">Esqueci minha senha</a>
         </div>
 
-        <div class="alert err" *ngIf="erroLogin">✕ {{ erroLogin }}</div>
-        <button type="submit" class="btn largo">Entrar como {{ perfil === 'admin' ? 'Administrador' : 'Cliente' }}</button>
+        <div class="alert err" *ngIf="erroLogin()">✕ {{ erroLogin() }}</div>
+        <button type="submit" class="btn largo" [disabled]="enviando()">
+          {{ enviando() ? 'Entrando...' : 'Entrar como ' + (loginForm.value.perfil === 'admin' ? 'Administrador' : 'Cliente') }}
+        </button>
         <p class="mut rodape">Não tem conta? <b class="clicavel" (click)="trocarAba('cadastrar')">Cadastre-se</b></p>
         <hr>
         <p class="mut dica">Usuários de teste: <b>cliente&#64;cardvault.jp</b> / cliente123 • <b>admin&#64;cardvault.jp</b> / admin1234</p>
       </form>
 
-      <!-- Aba Cadastrar -->
-      <form *ngIf="aba === 'cadastrar'" #fc="ngForm" (ngSubmit)="cadastrar(fc)" novalidate>
-        <div [ngClass]="{ err: no.invalid && no.touched }">
-          <label for="nomeCad">Nome completo</label>
-          <input id="nomeCad" name="nome" [(ngModel)]="cadastro.nome" #no="ngModel" required minlength="3">
-          <small *ngIf="no.invalid && no.touched">✕ Informe seu nome (mín. 3 caracteres)</small>
+      <!-- Aba Cadastrar (formulário reativo + validador assíncrono) -->
+      <form *ngIf="aba() === 'cadastrar'" [formGroup]="cadastroForm" (ngSubmit)="cadastrar()" novalidate>
+        <div [class.err]="invalido(cadastroForm.controls.nome)" [class.okf]="cadastroForm.controls.nome.valid && cadastroForm.controls.nome.dirty">
+          <label for="nomeCad">Nome completo *</label>
+          <input id="nomeCad" formControlName="nome">
+          <small *ngIf="invalido(cadastroForm.controls.nome)">✕ Informe seu nome (mín. 3 caracteres)</small>
         </div>
-        <div [ngClass]="{ err: ec.invalid && ec.touched }">
-          <label for="emailCad">E-mail</label>
-          <input id="emailCad" name="email" type="email" [(ngModel)]="cadastro.email" #ec="ngModel" required email pattern="[^@ ]+@[^@ ]+[.][^@ ]+">
-          <small *ngIf="ec.invalid && ec.touched">✕ Informe um e-mail válido</small>
+        <div [class.err]="invalido(cadastroForm.controls.email) || cadastroForm.controls.email.hasError('emailEmUso')"
+             [class.okf]="cadastroForm.controls.email.valid && cadastroForm.controls.email.dirty">
+          <label for="emailCad">E-mail *</label>
+          <input id="emailCad" type="email" formControlName="email">
+          <small *ngIf="cadastroForm.controls.email.pending" class="mut">⏳ Verificando disponibilidade...</small>
+          <small *ngIf="cadastroForm.controls.email.hasError('emailEmUso')">✕ Este e-mail já está cadastrado</small>
+          <small *ngIf="invalido(cadastroForm.controls.email) && !cadastroForm.controls.email.hasError('emailEmUso')">✕ Informe um e-mail válido</small>
+          <small *ngIf="cadastroForm.controls.email.valid && cadastroForm.controls.email.dirty">✓ E-mail disponível</small>
         </div>
-        <div [ngClass]="{ err: sc.invalid && sc.touched }">
-          <label for="senhaCad">Senha</label>
-          <input id="senhaCad" name="senha" type="password" [(ngModel)]="cadastro.senha" #sc="ngModel" required minlength="8">
-          <small *ngIf="sc.invalid && sc.touched">✕ Mínimo de 8 caracteres</small>
+        <div [class.err]="invalido(cadastroForm.controls.senha)" [class.okf]="cadastroForm.controls.senha.valid && cadastroForm.controls.senha.dirty">
+          <label for="senhaCad">Senha *</label>
+          <input id="senhaCad" type="password" formControlName="senha">
+          <small *ngIf="invalido(cadastroForm.controls.senha)">✕ Mínimo de 8 caracteres, com letras e números</small>
         </div>
-        <div [ngClass]="{ err: senhasDiferentes }">
-          <label for="confCad">Confirmação de senha</label>
-          <input id="confCad" name="confirmacao" type="password" [(ngModel)]="cadastro.confirmacao" required>
+        <div [class.err]="senhasDiferentes || invalido(cadastroForm.controls.confirmacao)">
+          <label for="confCad">Confirmação de senha *</label>
+          <input id="confCad" type="password" formControlName="confirmacao">
           <small *ngIf="senhasDiferentes">✕ As senhas não conferem</small>
+          <small *ngIf="invalido(cadastroForm.controls.confirmacao) && !senhasDiferentes">✕ Confirme a senha</small>
         </div>
-        <div class="alert err" *ngIf="erroCadastro">✕ {{ erroCadastro }}</div>
-        <button type="submit" class="btn largo" [disabled]="fc.invalid || senhasDiferentes">Criar conta</button>
+        <div class="alert err" *ngIf="erroCadastro()">✕ {{ erroCadastro() }}</div>
+        <button type="submit" class="btn largo" [disabled]="cadastroForm.invalid || cadastroForm.pending || enviando()">Criar conta</button>
       </form>
     </div>
   </div>
