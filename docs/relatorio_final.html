@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><title>Relatório Trabalho Final — CardVault JP</title>
+<style>
+body{font-family:Arial,Helvetica,sans-serif;font-size:12pt;line-height:1.5;color:#111;text-align:justify}
+.capa{height:240mm;display:flex;flex-direction:column;justify-content:space-between;text-align:center;page-break-after:always}
+.capa h1{font-size:20pt;margin:0}.capa p{margin:4px 0}
+h2{font-size:13pt;margin:22px 0 8px;text-transform:uppercase;page-break-after:avoid;break-after:avoid}h3{font-size:12pt;margin:16px 0 6px;page-break-after:avoid;break-after:avoid}
+p{margin:0 0 10px;text-indent:1.25cm}li p,.ni{text-indent:0}
+ul{margin:4px 0 10px 0;padding-left:22px}li{margin:2px 0}
+table{border-collapse:collapse;width:100%;font-size:10.5pt;margin:8px 0;text-align:left}td,th{border:1px solid #888;padding:5px 7px;text-align:left;vertical-align:top}th{background:#eee}
+figure{margin:10px 0 10px;text-align:center;page-break-inside:avoid}figure img{width:88%;border:1px solid #999}figcaption{font-size:10pt;margin-top:4px}
+code{font-family:Consolas,monospace;font-size:10pt;background:#f2f2f2;padding:1px 4px}
+pre{font-family:Consolas,monospace;font-size:9.5pt;background:#f6f6f6;border:1px solid #ccc;padding:8px 10px;line-height:1.35;text-align:left;white-space:pre-wrap;page-break-inside:avoid}
+.tela{page-break-before:always}
+.commits td{font-size:9pt;padding:3px 6px}.commits td:first-child{font-family:Consolas,monospace;white-space:nowrap}
+</style></head><body>
+
+<div class="capa">
+<div><p><b>UNIVERSIDADE FUMEC</b></p><p>CURSO DE CIÊNCIA DA COMPUTAÇÃO</p><p>DESENVOLVIMENTO WEB FRONT-END</p><p>PROF. DÂNGELO SILVA MIRANDA</p></div>
+<div><p>KAIQUE FERREIRA PEIXOTO</p><br><h1>CARDVAULT JP — TRABALHO FINAL</h1><p>Services, requisições HTTP e formulários reativos</p></div>
+<div><p>Belo Horizonte</p><p>2026</p></div>
+</div>
+
+<h2>1. Integrantes</h2>
+<p class="ni">Kaique Ferreira Peixoto (trabalho individual).</p>
+
+<h2>2. Descrição da aplicação</h2>
+<p class="ni"><b>Nome:</b> CardVault JP.</p>
+<p><b>Objetivo:</b> oferecer a colecionadores e lojistas um ambiente único para gestão, catalogação, avaliação e negociação de cartas colecionáveis de Pokémon TCG, com foco em coleções japonesas e itens de nicho. Esta é a última etapa do projeto: a aplicação Angular 22 (baseada em <code>NgModule</code>) do Trabalho 02 deixou de usar dados em memória e passou a armazenar tudo em uma base de dados acessada por uma <b>Web API (JSON-Server)</b>, com todas as operações feitas por <b>requisições HTTP</b> (<code>HttpClient</code>) dentro de classes <b>service</b>. Todos os formulários foram reescritos como <b>formulários reativos</b> com <code>Validators</code>. As cartas, nomes e coleções continuam fictícios e as artes são gradientes CSS.</p>
+<p class="ni"><b>Principais funcionalidades desta versão:</b></p>
+<ul>
+<li><b>Listagem e pesquisa</b> de cards no servidor (<code>GET /cards?q=...&amp;raridade=...</code>), com busca reativa (<code>debounceTime</code> + <code>switchMap</code>);</li>
+<li><b>Exibição</b> do card pela rota <code>/cards/:id</code> (<code>GET /cards/:id</code>) com histórico de preço real, gravado pela API;</li>
+<li><b>Cadastro, edição e exclusão</b> de cards (<code>POST</code>, <code>PUT</code>, <code>DELETE</code>) com regras de negócio no service (duplicidade de número, histórico de preço);</li>
+<li><b>Negociação:</b> envio de propostas (<code>POST /propostas</code>) e aceite/recusa no dashboard (<code>PATCH</code>);</li>
+<li><b>Login e cadastro de clientes</b> pela API (<code>/usuarios</code>), com validador assíncrono que impede e-mail repetido e sessão persistida;</li>
+<li><b>Fale conosco</b> gravando mensagens na API (<code>POST /mensagens</code>);</li>
+<li><b>Área administrativa protegida</b> por Route Guard e carregada por <b>Lazy Loading</b> (itens que estavam planejados no Kanban);</li>
+<li>Formulários reativos com <code>Validators</code> e validadores próprios, mensagens de erro/acerto por campo e bloqueio de envio enquanto houver campo inválido.</li>
+</ul>
+
+<h2>3. Arquitetura desta versão</h2>
+<h3>3.1 Estrutura de pastas</h3>
+<pre>cardvault-jp/
+├── prototipo/, relatorio/   (Trabalho 01)
+├── docs/                    prints-final/ + este relatório
+└── app/                     projeto Angular 22 (NgModule, zoneless)
+    ├── api/db.seed.json     dados iniciais da Web API (JSON-Server)
+    ├── scripts/prepare-db.mjs  cria/restaura api/db.json
+    └── src/app/
+        ├── app.module.ts           provideHttpClient + interceptor, SharedModule
+        ├── app-routing.module.ts   rotas públicas + /admin (lazy + guard)
+        ├── api.config.ts           API_URL = http://localhost:3000
+        ├── admin/                  AdminModule (lazy): admin-cards/, dashboard/
+        ├── shared/                 SharedModule e validadores.ts
+        ├── guards/                 admin.guard.ts (CanMatchFn)
+        ├── interceptors/           erro-api.interceptor.ts
+        ├── services/               card, auth, proposta, mensagem
+        ├── models/                 card, usuario, proposta, mensagem
+        ├── pipes/                  conservacao.pipe.ts
+        ├── components/navbar/
+        └── pages/                  catalogo/, detalhe-card/, login/, sobre/</pre>
+<p><b>Como executar:</b> dentro de <code>app/</code>, <code>npm install</code>; em um terminal <code>npm run api</code> (JSON-Server em <code>http://localhost:3000</code>) e em outro <code>npx ng serve</code> (aplicação em <code>http://localhost:4200</code>). O comando <code>npm run api:reset</code> restaura os dados iniciais. Usuários de teste: <code>cliente@cardvault.jp</code> / <code>cliente123</code> e <code>admin@cardvault.jp</code> / <code>admin1234</code>.</p>
+
+<h3>3.2 Base de dados e Web API (JSON-Server 0.17)</h3>
+<table>
+<tr><th>Recurso</th><th>Estrutura</th><th>Requisições usadas</th></tr>
+<tr><td><code>/cards</code></td><td>id, nome, colecao, numero, tipo, raridade, idioma, variante, estado, preco, estoque, ano, gradiente, dataCadastro, <b>historico</b> [{mes, valor}]</td><td>GET (com <code>q</code>, filtros e <code>_sort</code>), GET /:id, POST, PUT, DELETE</td></tr>
+<tr><td><code>/usuarios</code></td><td>id, nome, email, senha, perfil ('cliente' | 'admin')</td><td>GET <code>?email=&amp;perfil=</code>, POST</td></tr>
+<tr><td><code>/propostas</code></td><td>id, cardId, cardNome, nome, email, valorOferecido, mensagem, status ('pendente' | 'aceita' | 'recusada'), data</td><td>GET, POST, PATCH (status)</td></tr>
+<tr><td><code>/mensagens</code></td><td>id, nome, email, assunto, mensagem, data</td><td>GET, POST</td></tr>
+</table>
+<p>O arquivo versionado é o <code>api/db.seed.json</code> (12 cartas com 10 meses de histórico, 2 usuários e 1 proposta). Na primeira execução, <code>npm run api</code> copia o seed para <code>api/db.json</code>, que é o arquivo alterado pelo JSON-Server e fica fora do Git.</p>
+
+<h3>3.3 Classes do tipo service</h3>
+<table>
+<tr><th>Service</th><th>Métodos</th><th>Regras de negócio</th></tr>
+<tr><td><b>CardService</b></td><td><code>listar()</code>, <code>buscarPorId(id)</code>, <code>pesquisar(termo, filtros)</code>, <code>listarColecoes()</code>, <code>cadastrar(dados)</code>, <code>editar(id, dados)</code>, <code>excluir(id)</code>, <code>estatisticas()</code>, <code>variacaoPreco(card)</code></td><td>Valida nome/coleção, preço &gt; 0 e estoque ≥ 0 mesmo que o formulário seja burlado; impede dois cards com a mesma coleção e número; gera data de cadastro; ao mudar o preço, registra o novo valor no histórico do mês (até 12 meses); calcula os indicadores do dashboard.</td></tr>
+<tr><td><b>AuthService</b></td><td><code>login(email, senha, perfil, lembrar)</code>, <code>registrar(nome, email, senha)</code>, <code>emailDisponivel(email)</code>, <code>logout()</code>, signals <code>usuario</code>, <code>estaLogado</code>, <code>isAdmin</code></td><td>Normaliza o e-mail; novo cadastro sempre com perfil cliente; nunca guarda a senha na sessão; "lembrar de mim" usa <code>localStorage</code>, senão <code>sessionStorage</code>.</td></tr>
+<tr><td><b>PropostaService</b></td><td><code>listar()</code>, <code>enviar(proposta)</code>, <code>alterarStatus(id, status)</code></td><td>Toda proposta nasce "pendente" com a data do dia; a alteração usa <code>PATCH</code> só no campo status.</td></tr>
+<tr><td><b>MensagemService</b></td><td><code>listar()</code>, <code>enviar(mensagem)</code></td><td>Registra data e hora do envio.</td></tr>
+</table>
+<p>Todos os métodos retornam <code>Observable</code> e usam <code>HttpClient</code> (<code>get</code>, <code>post</code>, <code>put</code>, <code>patch</code>, <code>delete</code>) com <code>HttpParams</code> para os filtros. Os componentes nunca chamam a API diretamente. O <b>interceptor</b> <code>erroApiInterceptor</code> converte erros HTTP em mensagens em português (por exemplo, "Não foi possível conectar à API. Verifique se o JSON-Server está rodando"), exibidas nas telas. Como a aplicação é <i>zoneless</i>, o estado das telas é guardado em <b>signals</b>, que avisam o Angular para redesenhar quando a resposta HTTP chega.</p>
+
+<h3 style="page-break-before:always">3.4 Formulários reativos e validações</h3>
+<table>
+<tr><th>Formulário</th><th>Validators</th></tr>
+<tr><td>Cadastro/edição de card (admin)</td><td><code>required</code>, <code>minLength(3)</code>, <code>maxLength(60)</code>, <code>naoVazio</code> (nome); <code>required</code> (coleção, raridade, tipo, idioma, estado); <code>pattern</code> do número (006/102 ou P-031); <code>min(0.01)</code> (preço); <code>min(0)</code> + inteiro (estoque); <code>min(1996)</code>/<code>max(ano atual)</code>; <code>maxLength(40)</code> (variante)</td></tr>
+<tr><td>Login</td><td>e-mail obrigatório com <code>pattern</code> (domínio com ponto); senha <code>required</code> + <code>minLength(8)</code></td></tr>
+<tr><td>Cadastro de cliente</td><td>nome <code>minLength(3)</code>; e-mail com validador <b>assíncrono</b> <code>emailUnico</code> (consulta <code>GET /usuarios?email=</code>); senha com 8+ caracteres, letras e números; validador de <b>grupo</b> <code>camposIguais('senha', 'confirmacao')</code></td></tr>
+<tr><td>Proposta (detalhe)</td><td>nome e e-mail obrigatórios; valor <code>min(1)</code> e <code>max(2 × preço)</code> definido dinamicamente com <code>setValidators</code>; mensagem <code>maxLength(300)</code></td></tr>
+<tr><td>Fale conosco (sobre)</td><td>nome <code>minLength(3)</code>, e-mail <code>pattern</code>, mensagem <code>minLength(10)</code>/<code>maxLength(500)</code></td></tr>
+<tr><td>Busca do catálogo e filtro do admin</td><td><code>FormGroup</code>/<code>FormControl</code> observados com <code>valueChanges</code></td></tr>
+</table>
+<p>Cada campo mostra borda vermelha e a mensagem do erro quando está inválido e já foi tocado, e borda verde com "✓" quando está correto. Para impedir o envio de dados errados ao servidor, os métodos de envio verificam <code>form.invalid</code> (e <code>pending</code>, no caso do validador assíncrono), chamam <code>markAllAsTouched()</code> para revelar todos os erros e só então fazem a requisição; nos formulários de cadastro e proposta o botão também fica desabilitado enquanto o formulário é inválido. O <code>FormsModule</code>/<code>ngModel</code> foi removido do projeto.</p>
+
+<h3>3.5 Rotas, Route Guard e Lazy Loading</h3>
+<table>
+<tr><th>Caminho</th><th>Componente / ação</th><th>Acesso</th></tr>
+<tr><td><code>''</code> e <code>**</code></td><td>redirectTo <code>/catalogo</code></td><td>—</td></tr>
+<tr><td><code>catalogo</code></td><td>CatalogoComponent</td><td>público</td></tr>
+<tr><td><code>cards/:id</code></td><td>DetalheCardComponent</td><td>público</td></tr>
+<tr><td><code>login</code></td><td>LoginComponent (aceita <code>?retorno=</code>)</td><td>público</td></tr>
+<tr><td><code>sobre</code></td><td>SobreComponent</td><td>público</td></tr>
+<tr><td><code>admin</code> → <code>cards</code>, <code>dashboard</code></td><td><code>loadChildren: () =&gt; import('./admin/admin.module')</code></td><td><b>admin</b> (<code>canMatch: [adminGuard]</code>)</td></tr>
+<tr><td><code>dashboard</code></td><td>redirectTo <code>/admin/dashboard</code> (compatibilidade)</td><td>—</td></tr>
+</table>
+<p>O <code>adminGuard</code> é um guard funcional (<code>CanMatchFn</code>): visitante não logado é enviado para <code>/login?retorno=/admin/...</code> e, após o login, volta para a página que tentou abrir; cliente logado é enviado ao catálogo. Por ser <code>canMatch</code>, o código do <code>AdminModule</code> (chunk separado de ~23 kB no build) só é baixado por administradores. A navbar também esconde os links Dashboard e Admin de quem não é administrador.</p>
+
+<h2>4. Telas</h2>
+<p>Os prints a seguir foram capturados com a aplicação e o JSON-Server em execução, na resolução 1440×900, usando Playwright. O mesmo roteiro automatizado validou 18 fluxos (busca, guard, cadastro, CRUD, propostas, mensagens), conferindo também o conteúdo gravado na API, sem erros no console.</p>
+
+<div><h3>4.1 Login e cadastro (/login)</h3>
+<figure><img style="width:80%" src="prints-final/01-login.png"><figcaption>Figura 1 — Login com seleção de perfil</figcaption></figure>
+<figure><img style="width:80%" src="prints-final/02-cadastro-validacao.png"><figcaption>Figura 2 — Cadastro com validador assíncrono (e-mail já cadastrado) e senhas diferentes</figcaption></figure>
+<ul>
+<li>Formulários reativos <code>loginForm</code> e <code>cadastroForm</code>, com abas alternadas por signal;</li>
+<li>Login consulta <code>GET /usuarios?email=&amp;perfil=</code>; "lembrar de mim" mantém a sessão após fechar o navegador;</li>
+<li>Cadastro grava com <code>POST /usuarios</code>; e-mail verificado na API enquanto o usuário digita ("Verificando disponibilidade..."); botão Criar conta desabilitado enquanto houver erro;</li>
+<li>Após o login o usuário volta para a página protegida que tentou abrir (<code>?retorno=</code>) ou segue para a página do seu perfil.</li>
+</ul></div>
+
+<div class="tela"><h3>4.2 Catálogo (/catalogo)</h3>
+<figure><img style="width:76%" src="prints-final/03-catalogo.png"><figcaption>Figura 3 — Catálogo carregado da API (12 cards)</figcaption></figure>
+<figure><img style="width:76%" src="prints-final/04-catalogo-filtros.png"><figcaption>Figura 4 — Busca "holo" com filtro de tipo Fogo, resolvida no servidor</figcaption></figure>
+<ul>
+<li>Barra de busca e filtros em um <code>FormGroup</code>; cada alteração gera <code>GET /cards?q=holo&amp;tipo=Fogo&amp;_sort=nome</code>;</li>
+<li><code>debounceTime(300)</code> evita uma requisição por tecla e <code>switchMap</code> cancela buscas antigas;</li>
+<li>Tags dos filtros ativos (clique remove o filtro), Limpar filtros, mensagens de carregamento, de lista vazia e de erro de conexão;</li>
+<li>Clique no card abre o detalhe com <code>Router.navigate(['/cards', id])</code>.</li>
+</ul></div>
+
+<div class="tela"><h3>4.3 Detalhe do card e proposta (/cards/:id)</h3>
+<figure><img style="width:80%" src="prints-final/09-detalhe.png"><figcaption>Figura 5 — Detalhe do card #1002 obtido com GET /cards/1002</figcaption></figure>
+<figure><img style="width:80%" src="prints-final/10-detalhe-proposta.png"><figcaption>Figura 6 — Histórico de preço da API e formulário reativo de proposta</figcaption></figure>
+<ul>
+<li><code>paramMap</code> + <code>switchMap</code> buscam o card na API; mensagem quando o id não existe;</li>
+<li>Gráfico SVG montado a partir do campo <code>historico</code> salvo na API (não é mais simulado) e variação percentual do período;</li>
+<li>Negociar abre o formulário de proposta já preenchido com o usuário logado; a oferta não pode passar do dobro do preço; envio com <code>POST /propostas</code>;</li>
+<li>Botão Editar visível apenas para administradores (abre <code>/admin/cards?editar=id</code>).</li>
+</ul></div>
+
+<div class="tela"><h3>4.4 Route Guard</h3>
+<figure><img style="width:80%" src="prints-final/05-guard-login.png"><figcaption>Figura 7 — Visitante que acessa /admin/cards é redirecionado para /login?retorno=%2Fadmin%2Fcards</figcaption></figure>
+<ul>
+<li>Visitante e cliente não veem os links da área administrativa e não conseguem acessá-la pela URL.</li>
+</ul></div>
+
+<div class="tela"><h3>4.5 Cadastro administrativo (/admin/cards)</h3>
+<figure><img style="width:80%" src="prints-final/06-admin-lista.png"><figcaption>Figura 8 — Formulário reativo e tabela de cards vindos da API</figcaption></figure>
+<figure><img style="width:80%" src="prints-final/07-admin-validacao.png"><figcaption>Figura 9 — Tentativa de salvar com campos inválidos: nada é enviado ao servidor</figcaption></figure>
+</div>
+<div>
+<figure><img style="width:80%" src="prints-final/08-admin-edicao.png"><figcaption>Figura 10 — Edição do card #1002 carregado com GET /cards/1002 e patchValue</figcaption></figure>
+<ul>
+<li>Inclusão (<code>POST /cards</code>), edição (<code>PUT /cards/:id</code>) e exclusão com confirmação (<code>DELETE /cards/:id</code>);</li>
+<li>Mensagens por campo (obrigatório, mínimo/máximo, formato do número, faixa do ano, preço e estoque) e aviso geral "Corrija os campos destacados";</li>
+<li>Regra de duplicidade: o service recusa outro card com a mesma coleção e número ("Já existe um card nº 006/102 na coleção Origem JP");</li>
+<li>Filtro da tabela com <code>FormControl</code> (busca no servidor), prévia da arte em tempo real e botão de salvar desabilitado durante a requisição.</li>
+</ul></div>
+
+<div class="tela"><h3>4.6 Dashboard (/admin/dashboard)</h3>
+<figure><img src="prints-final/11-dashboard.png"><figcaption>Figura 11 — Indicadores calculados a partir da API e propostas recebidas</figcaption></figure>
+<ul>
+<li><code>forkJoin</code> busca cards, propostas e mensagens em paralelo;</li>
+<li>KPIs (cartas, unidades, valor do acervo, propostas pendentes), gráfico por coleção, distribuição por raridade e top 5 mais valiosas;</li>
+<li>Propostas recebidas com Aceitar/Recusar (<code>PATCH /propostas/:id</code>), atualizando o status na hora.</li>
+</ul></div>
+
+<div class="tela"><h3>4.7 Sobre (/sobre)</h3>
+<figure><img style="width:80%" src="prints-final/12-sobre.png"><figcaption>Figura 12 — Formulário reativo "Fale conosco" com validação</figcaption></figure>
+<ul>
+<li>Unidades no acervo calculadas pela API; envio da mensagem com <code>POST /mensagens</code>;</li>
+<li>Validação de nome, e-mail e mensagem (10 a 500 caracteres, com contador).</li>
+</ul></div>
+
+<h2 style="page-break-before:always">5. Versionamento</h2>
+<p class="ni"><b>Repositório:</b> https://github.com/IsseiSenju/cardvault-jp</p>
+<p><b>GitFlow:</b> cada bloco foi feito em uma branch <code>feature/*</code> criada a partir da <code>develop</code> e integrada com <code>merge --no-ff</code>. Ao final, a <code>develop</code> foi integrada na <code>main</code> e marcada com a tag <code>v1.0.0</code>.</p>
+<table>
+<tr><th>Branch (Trabalho Final)</th><th>Conteúdo</th></tr>
+<tr><td>feature/json-server</td><td>Dependência json-server, base inicial (seed) e scripts npm da API</td></tr>
+<tr><td>feature/http-services</td><td>Models, interceptor, CardService/AuthService com HttpClient, PropostaService e MensagemService</td></tr>
+<tr><td>feature/reactive-forms</td><td>SharedModule, validadores e migração de catálogo, detalhe, login e sobre para reactive forms</td></tr>
+<tr><td>feature/area-admin</td><td>adminGuard, AdminModule com lazy loading, admin e dashboard reativos, navbar por perfil</td></tr>
+<tr><td>feature/documentacao-final</td><td>README, prints, este relatório, Kanban, slides e pacote de entrega</td></tr>
+</table>
+<p><b>Conventional Commits:</b> mensagens no formato <code>tipo(escopo): descrição</code> (<code>feat</code>, <code>build</code>, <code>chore</code>, <code>docs</code>, <code>merge</code>), cada commit com uma única alteração lógica. Commits do Trabalho Final (<code>git log --oneline</code>, do mais recente para o mais antigo):</p>
+<table class="commits">
+<tr><th>Hash</th><th>Mensagem</th></tr>
+<!--COMMITS-->
+</table>
+<p class="ni" style="font-size:10pt">Após a geração deste relatório foram feitos ainda os commits que adicionam este PDF, o Kanban, os slides e o pacote de entrega, os merges finais e a tag <code>v1.0.0</code>.</p>
+
+<h2>6. Próximos passos</h2>
+<ul>
+<li>Substituir o JSON-Server por um back-end real (por exemplo, Node/NestJS ou Spring com banco relacional), com senhas criptografadas (hash) e autenticação por token JWT validado no servidor;</li>
+<li>Lista de desejos persistida por usuário e área "Minhas propostas" para o cliente acompanhar o status das negociações;</li>
+<li>Upload de imagens reais das cartas e paginação da listagem no servidor (<code>_page</code>/<code>_limit</code>);</li>
+<li>Testes unitários dos services e dos validadores e publicação da aplicação (deploy).</li>
+</ul>
+</body></html>
